@@ -1,9 +1,9 @@
 var express = require("express");
 var router = express.Router();
-// const insert = require("../model/dbInsert");
+const insert = require("../model/dbInsert");
 /* GET users listing. */
 router.get("/", function (req, res, next) {
-  // insert()
+  insert()
 });
 
 module.exports = router;
