@@ -2,6 +2,7 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
 var logger = require('morgan');
 // require('dotenv').config({path: './.env'});
 require('dotenv').config();
@@ -9,6 +10,7 @@ require('dotenv').config();
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var fillRouter = require('./routes/fillDB');
+var notesRouter = require('./routes/notes');
 
 var app = express();
 
@@ -22,9 +24,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(bodyParser.json()); // support json encoded bodies 
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/fill', fillRouter);
+app.use('/notes', notesRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
