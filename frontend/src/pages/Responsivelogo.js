@@ -7,7 +7,7 @@ function Responsivelogo() {
   const [isMobile, setIsMobile] = useState(false);
 
   const handleResize = () => {
-    setIsMobile(window.innerWidth <= 588); // Example breakpoint for mobile
+    setIsMobile(window.innerWidth <= 590); // Example breakpoint for mobile
   };
 
   // Add an event listener to handle window resize

@@ -33,10 +33,10 @@ const Signup = ({ setUser }) => {
       boxShadow: '5px 5px 10px #ccc',
       borderRadius: 4,
       maxWidth: 400,
-      width: 590,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
+      justifyContent: 'center',
     },
     heading: {
       fontFamily: 'Poppins',
@@ -60,11 +60,15 @@ const Signup = ({ setUser }) => {
 
   return (
 
-    <div className='all'>
-      <section>
+<Box sx=
+{{display: 'flex',flexDirection:{sm:'column',md:'row'} ,
+justifyContent:'center',
+alignItems: 'center',
+}}>
+      <Box sx={{ maxWidth: '100%', height: 'auto' ,display: {xs:'none',sm:'block'}}}>
         <img src={require("../assets/sign-up.gif")} alt="singup" className="singup-img" loading='lazy' />
-      </section>
-      <section className='section'>
+      </Box>
+
         <Box className={classes.formContainer}>
           <Typography variant="h5" className={classes.heading}> Sign Up </Typography>
 
@@ -145,8 +149,8 @@ const Signup = ({ setUser }) => {
             </Button>
           </Box>
         </Box>
-      </section>
-    </div>
+
+      </Box>
   );
 };
 export default Signup;
