@@ -1,11 +1,10 @@
 import {Outlet} from 'react-router-dom';
-import StyledNavBar from '../component/StyledNavBar';
+import StyledNavBar from '../Navbar/StyledNavBar';
 const SharedLayout = () => {
     return(
 <>
 <StyledNavBar/>
   <Outlet /> {/*it will render the child nested routes*/}
-  {/*هيك الهوم بيج حتضل تطلع بكل صفحات النستد جواها*/}
 </>
     );
 };

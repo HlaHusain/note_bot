@@ -29,7 +29,7 @@ const Signup = ({ setUser }) => {
     formContainer: {
       backgroundColor: '#A5A5A51A',
       padding: '2rem 2.5rem',
-      margin: '3rem 0',
+      margin: '2rem 0',
       boxShadow: '5px 5px 10px #ccc',
       borderRadius: 4,
       maxWidth: 400,
