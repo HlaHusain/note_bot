@@ -1,6 +1,6 @@
-const uuid = require("uuid");
+const uuid = require('uuid');
 
-//DUMMY DATA :)
+//DUMMY DATA :), it is only stored in the memory!
 const dummyData = [
     {
       archive_from_id: "",
@@ -38,6 +38,7 @@ const createNote = (req, res, next) => {
     const {user_id, title, isPublic, course_id}  = req.body;
     
     const createdNote = {
+        // Generating a random id by using uuid package (a third party package)
         id: uuid.v4(),
         user_id: user_id,
         title: title,
@@ -45,7 +46,9 @@ const createNote = (req, res, next) => {
         course_id: course_id,
     };
     
-    dummyData.push(createdNote);
+    dummyData.push(createdNote); // or by using unsift() to add it to the beginning of the array
+    
+    // Status code 201 means "Created"
     res.status(201).json({message: "Note created!", note: createdNote});
 };
 
