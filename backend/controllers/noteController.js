@@ -1,7 +1,7 @@
 const noteModel = require('../model/noteModel')
 const uuid = require("uuid");
 
-//DUMMY DATA :)
+//DUMMY DATA :), it is only stored in the memory!
 const dummyData = [
     {
       archive_from_id: "",
@@ -41,6 +41,7 @@ const getNoteByUserId = (req, res, next) => {
     const {user_id, title, isPublic, course_id}  = req.body;
     
     const createdNote = {
+        // Generating a random id by using uuid package (a third party package)
         id: uuid.v4(),
         user_id: user_id,
         title: title,
