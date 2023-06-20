@@ -1,7 +1,7 @@
 var express = require("express");
 var router = express.Router();
 const insert = require("../model/dbInsert");
-/* GET users listing. */
+/* register route */
 router.get("/", function (req, res, next) {
   insert()
 });

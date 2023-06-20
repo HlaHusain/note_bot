@@ -4,9 +4,10 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var logger = require('morgan');
-// require('dotenv').config({path: './.env'});
+
 require('dotenv').config();
 
+//import the routes
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var fillRouter = require('./routes/fillDB');
@@ -26,6 +27,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(bodyParser.json()); // support json encoded bodies 
 
+//midellware , initial filter path '/users'
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/fill', fillRouter);

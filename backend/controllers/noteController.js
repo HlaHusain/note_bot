@@ -1,3 +1,4 @@
+const noteModel = require('../model/noteModel')
 const uuid = require("uuid");
 
 //DUMMY DATA :)
@@ -8,7 +9,7 @@ const dummyData = [
       title: "Notes in AWT",
       avg_rate: "4",
       isPublic: 1,
-      course_id: 13
+      course_id: 15
     },
     {
       archive_from_id: "",
@@ -28,13 +29,15 @@ const getNotes = (req, res, next) => {
 
 // Get a user notes by user_id
 const getNoteByUserId = (req, res, next) => {  
+  //get id from params url
     const user_id = req.params.user_id;
     const notes = dummyData.find((n) => n.user_id === user_id );
     res.json(notes);
 };
 
 // Create a new note
-const createNote = (req, res, next) => {
+ const createNote = async (req, res, next) => {
+
     const {user_id, title, isPublic, course_id}  = req.body;
     
     const createdNote = {
@@ -46,6 +49,7 @@ const createNote = (req, res, next) => {
     };
     
     dummyData.push(createdNote);
+    await noteModel.insertMany(createdNote)
     res.status(201).json({message: "Note created!", note: createdNote});
 };
 

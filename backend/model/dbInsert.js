@@ -112,7 +112,7 @@ const widgets = [
 ];
 
 async function insertDB() {
-  console.log("test");
+
   try {
     // await userModel.insertMany(users)
     // await noteModel.insertMany(notes)
@@ -127,5 +127,5 @@ async function insertDB() {
   }
 }
 
-// insertDB();
+insertDB();
 module.exports = insertDB;

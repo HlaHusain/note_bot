@@ -18,7 +18,7 @@ const noteSchema = new mongoose.Schema({
   },
   avg_rate: {
     type: String,
-    required: true,
+    required: false,
   },
   isPublic: {
     type: Boolean,
