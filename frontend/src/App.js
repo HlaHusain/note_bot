@@ -15,7 +15,6 @@ function App() {
   return (
     <>
     <BrowserRouter>
-     {/*هيكل او بناء الراوتس*/}
       <Routes>
         <Route path='/' element={<SharedLayout />}>
           <Route index element={<Home />} />
