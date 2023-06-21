@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  notes: [{ 
+    type: mongoose.Types.ObjectId,
+    ref:'Note'
+  }],
 });
 
 const userModel = mongoose.model(collectionName_users, userSchema);

@@ -9,25 +9,28 @@ const users = [
     password: "323!!FGLLWW!",
     user_name: "Hla",
     study_field: "Computer Engineering",
+    notes: [],
   },
   {
     email: "test@gmail.com",
     password: "323!!FGLLWW!",
     user_name: "Hla",
     study_field: "Computer Engineering ISE",
+    notes: [],
   },
   {
     email: "test2@gmail.com",
     password: "323!!FGLLWW!",
     user_name: "Hla",
     study_field: "Master of Computer Engineering",
+    notes: [],
   },
 ];
 
 const getUsers = async (req, res, next) => {
   let users;
   try {
-    const users = await User.find({}, "-password");
+    users = await User.find({}, "-password"); //exclude password :)
     res.json({ users });
   } catch (err) {
     return res
@@ -41,7 +44,7 @@ const signup = async (req, res, next) => {
   const { user_name, email, password, study_field } = req.body;
   let existingUser;
   try {
-    existingUser = User.findOne({ email: email });
+    existingUser = await User.findOne({ email: email });
   } catch (err) {
     return res
       .status(500)
