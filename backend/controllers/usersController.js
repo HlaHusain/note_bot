@@ -2,7 +2,6 @@ const User = require("../model/userModel");
 const bcrypt = require("bcryptjs");
 //JSON Web Tokens (JWTs) are the most common way of implementing authentication in Single-Page-Applications.
 const jwt = require("jsonwebtoken");
-//middleware
 
 const users = [
   {
@@ -51,7 +50,7 @@ const signup = async (req, res, next) => {
 
   if(existingUser.email) {
     return res
-      .status(422)
+      .status(422) //422 is for invalid input
       .json({ message: "User exists alreay , please login instead " });
   }
 
@@ -94,7 +93,7 @@ const signup = async (req, res, next) => {
   }
 
   res
-    .status(201)
+    .status(201) //201 is for created
     .json({ user: createdUser.id, email: createdUser.email, token: token });
 };
 
@@ -128,7 +127,7 @@ const login = async (req, res, next) => {
 
   if (!isVaildPassword) {
     return res
-      .status(401)
+      .status(401) //401 is for unauthorized
       .json({ message: "Invalid credentials  , Could not log you in " });
   }
 
