@@ -9,6 +9,10 @@ const courseSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  notes: [{ 
+    type: mongoose.Types.ObjectId,
+    ref:'Note'
+  }],
 
 });
 

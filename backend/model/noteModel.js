@@ -28,7 +28,7 @@ const noteSchema = new mongoose.Schema({
   course_id: {
     type: mongoose.Types.ObjectId,
     required: true,
-    ref:'User'
+    ref:'Course'
   },
 
 });
