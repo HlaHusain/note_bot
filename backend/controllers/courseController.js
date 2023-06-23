@@ -20,6 +20,7 @@ const getCoursesByUserId = async (req, res, next) => {
     res.json({ courses: courses.map(course => course.toObject({ getters: true })) });
     }
 
+
     //create a new course
     const createCourse = async (req, res, next) => {
         const { course_name, course_code, course_description, user_id } = req.body;

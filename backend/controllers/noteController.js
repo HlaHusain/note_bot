@@ -39,6 +39,26 @@ const getNoteByUserId = async (req, res, next) => {
     return res.status(500).json({ message: "Getting notes failed, please try again later." });
   }
 };
+// Get all notes by course title
+const getNotesByCourseTitle = async (req, res, next) => {
+  const searchKeyword = req.params.keyword;
+
+  try {
+    // Get all courses that match the search keyword
+    const courses = await courseModel.find({ title: { $regex: searchKeyword, $options: 'i' } });
+    const courseIds = courses.map(course => course._id);
+
+    // Get all notes that match the course ids
+    const notes = await noteModel.find({ course_id: { $in: courseIds } })
+      .populate('course_id');
+
+    res.json({ notes: notes.map(note => note.toObject({ getters: true })) });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'An error occurred while fetching notes.' });
+  }
+};
+
 
 
 // Create a new note
@@ -164,10 +184,10 @@ const deleteNote = async (req, res, next) => {
 };
 
 
-
 //exports.getNotes = getNotes;
 exports.getPublicNotesByCourseId = getPublicNotesByCourseId;
 exports.getNoteByUserId = getNoteByUserId;
+exports.getNotesByCourseTitle = getNotesByCourseTitle;
 exports.createNote = createNote;
 exports.updateNote = updateNote;
 exports.deleteNote = deleteNote;

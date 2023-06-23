@@ -11,9 +11,14 @@ const sectionSchema = new mongoose.Schema({
     required: true,
   },
   note_id: {
-    type: String,
+    type: mongoose.Types.ObjectId,
     required: true,
+    ref:'Note'
   },
+  widgets: [{
+    type: mongoose.Types.ObjectId,
+    ref:'Widget'
+  }],
 });
 
 const sectionModel = mongoose.model(collectionName_sections, sectionSchema);

@@ -18,8 +18,9 @@ const widgetSchema = new mongoose.Schema({
     required: true,
   },
   section_id: {
-    type: String,
+    type: mongoose.Types.ObjectId,
     required: true,
+    ref: "Section",
   },
 });
 

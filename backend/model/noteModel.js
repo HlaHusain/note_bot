@@ -30,6 +30,10 @@ const noteSchema = new mongoose.Schema({
     required: true,
     ref:'Course'
   },
+  sections: [{
+    type: mongoose.Types.ObjectId,
+    ref:'Section'
+  }],
 
 });
 
