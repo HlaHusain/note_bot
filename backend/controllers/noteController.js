@@ -11,12 +11,10 @@ const getPublicNotesByCourseId = async (req, res, next) => {
   try {
     const publicNotesByCourse = await noteModel.find({ isPublic: true, course_id });
     const noteTitles = publicNotesByCourse.map(note => note.title);
-    res.json({ notes: noteTitles });
+    res.json({ notes: noteTitles.map(note => note.toObject({ getters: true })) });
   } catch (err) {
-    console.log(err);
-    return res
-      .status(500)
-      .json({ message: "Fetching public notes failed, please try again later." });
+   const error = new HttpError( 'An error occurred while fetching notes. ', 500);
+    return next(error);
   }
 };
 
@@ -35,10 +33,12 @@ const getNoteByUserId = async (req, res, next) => {
 
     res.json({ notes: user.notes.map(note => note.toObject({ getters: true })) });
   } catch (err) {
-    console.log(err);
-    return res.status(500).json({ message: "Getting notes failed, please try again later." });
+    const error = new HttpError( 'An error occurred while fetching notes. ', 500);
+    return next(error);
   }
 };
+
+
 // Get all notes by course title
 const getNotesByCourseTitle = async (req, res, next) => {
   const searchKeyword = req.params.keyword;
@@ -53,9 +53,9 @@ const getNotesByCourseTitle = async (req, res, next) => {
       .populate('course_id');
 
     res.json({ notes: notes.map(note => note.toObject({ getters: true })) });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: 'An error occurred while fetching notes.' });
+  } catch (err) {
+    const error = new HttpError( 'An error occurred while fetching notes. ', 500);
+    return next(error);
   }
 };
 
@@ -110,10 +110,9 @@ const createNote = async (req, res, next) => {
     } finally {
       session.endSession();
     }
-  } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Creating note failed, please try again later." });
+  } catch (err) {
+    const error = new HttpError( 'Creating note failed, please try again later.', 500);
+    return next(error);
   }
 };
 
@@ -136,10 +135,10 @@ const updateNote = async (req, res, next) => {
 
     note = await note.save();
 
-    res.status(200).json({ message: "Note updated!", note });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Updating note failed, please try again later." });
+    res.status(200).json({ message: "Note updated!", note: note.toObject({ getters: true }) });
+  } catch (err) {
+    const error = new HttpError( 'Updating note failed, please try again later.', 500);
+    return next(error);
   }
 };
 
@@ -178,11 +177,22 @@ const deleteNote = async (req, res, next) => {
     await Promise.all([user.save(), course.save()]);
 
     res.json({ message: "Note deleted!", note });
-  } catch (error) {
-    return res.status(500).json({ message: "Deleting note failed, please try again later." });
+  } catch (err) {
+    const error = new HttpError( 'Deleting note failed, please try again later.', 500);
+    return next(error);
   }
 };
 
+//get all notes
+const getNotes = async (req, res, next) => {
+  try {
+    const notes = await noteModel.find();
+    res.json({ notes: notes.map(note => note.toObject({ getters: true })) });
+  } catch (err) {
+    const error = new HttpError( 'An error occurred while fetching notes. ', 500);
+    return next(error);
+  }
+};
 
 //exports.getNotes = getNotes;
 exports.getPublicNotesByCourseId = getPublicNotesByCourseId;
@@ -191,3 +201,4 @@ exports.getNotesByCourseTitle = getNotesByCourseTitle;
 exports.createNote = createNote;
 exports.updateNote = updateNote;
 exports.deleteNote = deleteNote;
+exports.getNotes = getNotes;

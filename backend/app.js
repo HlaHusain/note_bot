@@ -35,7 +35,10 @@ res.setHeader('Access-Control-Allow-Methods' , 'GET,POST,PATCH,DELETE')
 next()
 })
 
-
+app.use((req, res, next) => {
+  res.setHeader('Content-Security-Policy', "default-src 'self'");
+  next();
+});
 
 app.use(bodyParser.json()); // support json encoded bodies 
 
