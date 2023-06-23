@@ -1,6 +1,6 @@
 const mongoose = require("./dbconnection.js");
 // Initialize parameters
-const collectionName_notes = process.env.DB_COLLECTION_NOTES;
+const collectionName_notes = 'notes';
 
 //define structure of the documents in a collection
 const noteSchema = new mongoose.Schema({
@@ -11,7 +11,7 @@ const noteSchema = new mongoose.Schema({
   user_id: {
     type: mongoose.Types.ObjectId,
     required: true,
-    ref:'User'
+    ref:'users'
   },
   title: {
     type: String,
@@ -28,11 +28,11 @@ const noteSchema = new mongoose.Schema({
   course_id: {
     type: mongoose.Types.ObjectId,
     required: true,
-    ref:'Course'
+    ref:'courses'
   },
   sections: [{
     type: mongoose.Types.ObjectId,
-    ref:'Section'
+    ref:'sections'
   }],
 
 });

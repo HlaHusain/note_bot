@@ -3,17 +3,23 @@ const userModel = require('../model/userModel');
 const courseModel = require('../model/courseModel');
 const mongoose = require('mongoose');
 const HttpError = require('../model/http-error');
+const { validationResult } = require('express-validator');
 
-// Get all notes by course_id: where isPublic = true
-const getPublicNotesByCourseId = async (req, res, next) => {
-  const { course_id } = req.params;
-  
+//Get all notes by user_id and course_id
+const getNotesByUserIdAndCourseId = async (req, res, next) => {
+  const { user_id, course_id } = req.params;
+
   try {
-    const publicNotesByCourse = await noteModel.find({ isPublic: true, course_id });
-    const noteTitles = publicNotesByCourse.map(note => note.title);
-    res.json({ notes: noteTitles.map(note => note.toObject({ getters: true })) });
+    const user = await userModel.findById(user_id).populate('notes');
+
+    if (!user.notes || user.notes.length === 0) {
+      return res.status(404).json({ message: "Could not find notes for the provided user id." });
+    }
+
+    res.json({ notes: user.notes.filter(note => note.course_id.toString() === course_id)
+                                .map(note => note.toObject({ getters: true })) });
   } catch (err) {
-   const error = new HttpError( 'An error occurred while fetching notes. ', 500);
+    const error = new HttpError( 'An error occurred while fetching notes. ', 500);
     return next(error);
   }
 };
@@ -30,7 +36,7 @@ const getNoteByUserId = async (req, res, next) => {
     if (!user.notes || user.notes.length === 0) {
       return res.status(404).json({ message: "Could not find notes for the provided user id." });
     }
-
+    console.log(user); // Log the user object to the console
     res.json({ notes: user.notes.map(note => note.toObject({ getters: true })) });
   } catch (err) {
     const error = new HttpError( 'An error occurred while fetching notes. ', 500);
@@ -194,8 +200,7 @@ const getNotes = async (req, res, next) => {
   }
 };
 
-//exports.getNotes = getNotes;
-exports.getPublicNotesByCourseId = getPublicNotesByCourseId;
+exports.getNotesByUserIdAndCourseId = getNotesByUserIdAndCourseId;
 exports.getNoteByUserId = getNoteByUserId;
 exports.getNotesByCourseTitle = getNotesByCourseTitle;
 exports.createNote = createNote;
