@@ -3,7 +3,7 @@ const userModel = require('../model/userModel');
 const courseModel = require('../model/courseModel');
 const mongoose = require('mongoose');
 const HttpError = require('../model/http-error');
-const { validationResult } = require('express-validator');
+//const { validationResult } = require('express-validator');
 
 //Get all notes by user_id and course_id
 const getNotesByUserIdAndCourseId = async (req, res, next) => {
@@ -23,8 +23,6 @@ const getNotesByUserIdAndCourseId = async (req, res, next) => {
     return next(error);
   }
 };
-
-
 
 // Get user notes by user_id
 const getNoteByUserId = async (req, res, next) => {
