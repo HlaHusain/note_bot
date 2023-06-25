@@ -97,6 +97,7 @@ const createNote = async (req, res, next) => {
         title,
         isPublic,
         course_id,
+        sections: [], // Empty sections array
       });
 
       await createdNote.save({ session });
