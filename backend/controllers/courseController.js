@@ -18,14 +18,27 @@ const getCoursesByUserId = async (req, res, next) => {
       if (!user) {
         return res.status(404).json({ message: "Could not find user for the provided id." });
       }
-  
-      // Get unique course IDs from the user's notes
-      const courseIds = Array.from(new Set(user.notes.map(note => note.course_id)));
-  
-      // Fetch the courses based on the unique course IDs
-      const courses = await courseModel.find({ _id: { $in: courseIds } });
-  
-      res.json({ courses });
+     
+    // Calculate the number of notes for each course
+    const courses = {};
+    user.notes.forEach((note) => {
+      const courseTitle = note.course_id.title;
+
+      if (!courses[courseTitle]) {
+        courses[courseTitle] = {
+          title: courseTitle,
+          numOfNotes: 0
+        };
+      }
+
+      courses[courseTitle].numOfNotes++;
+    });
+
+    // Convert the courses object to an array of courses
+    const coursesArray = Object.values(courses);
+
+    res.json({ courses: coursesArray });
+
     } catch (err) {
       const error = new HttpError('An error occurred while fetching notes.', 500);
       return next(error);

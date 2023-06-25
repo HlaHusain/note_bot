@@ -34,7 +34,10 @@ const noteSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref:'sections'
   }],
-
+  saved_by: [{
+    type: mongoose.Types.ObjectId,
+    ref: 'users'
+  }],
 });
 
 const noteModel = mongoose.model(collectionName_notes, noteSchema);

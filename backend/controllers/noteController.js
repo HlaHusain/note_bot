@@ -34,8 +34,28 @@ const getNoteByUserId = async (req, res, next) => {
     if (!user.notes || user.notes.length === 0) {
       return res.status(404).json({ message: "Could not find notes for the provided user id." });
     }
-    console.log(user); // Log the user object to the console
-    res.json({ notes: user.notes.map(note => note.toObject({ getters: true })) });
+    
+    //res.json({ notes: user.notes.map(note => note.toObject({ getters: true })) });
+     // Group notes by course ID
+     const groupedNotes = {};
+     user.notes.forEach((note) => {
+       const courseId = note.course_id._id.toString();
+ 
+       if (!groupedNotes[courseId]) {
+         groupedNotes[courseId] = {
+           course_id: note.course_id._id,
+           course_title: note.course_id.title,
+           notes: []
+         };
+       }
+ 
+       groupedNotes[courseId].notes.push(note);
+     });
+ 
+     // Convert the grouped notes object to an array
+     const groupedNotesArray = Object.values(groupedNotes);
+ 
+     res.json({ notes: groupedNotesArray });
   } catch (err) {
     const error = new HttpError( 'An error occurred while fetching notes. ', 500);
     return next(error);
@@ -54,9 +74,11 @@ const getNotesByCourseTitle = async (req, res, next) => {
 
     // Get all notes that match the course ids
     const notes = await noteModel.find({ course_id: { $in: courseIds } })
-      .populate('course_id');
+      .populate('course_id', 'title')
+      .populate('user_id', 'user_name')
+      .select('note_id title');
 
-    res.json({ notes: notes.map(note => note.toObject({ getters: true })) });
+    res.json(notes);
   } catch (err) {
     const error = new HttpError( 'An error occurred while fetching notes. ', 500);
     return next(error);
@@ -188,6 +210,67 @@ const deleteNote = async (req, res, next) => {
   }
 };
 
+// save note
+const saveNote = async (req, res, next) => {
+  const { user_id, note_id } = req.params;
+
+  try {
+    // Find the user by user_id
+    const user = await userModel.findById(user_id);
+    
+    if (!user) {
+      return res.status(404).json({ message: "Could not find user for the provided id." });
+    }
+
+    // Find the note by note_id
+    const note = await noteModel.findById(note_id);
+    
+    if (!note) {
+      return res.status(404).json({ message: "Could not find note for the provided id." });
+    }
+    
+    // Check if the user who wrote the note is different from the user trying to save it
+    if (note.user_id.toString() === user._id.toString()) {
+      return res.status(400).json({ message: "Cannot save a note written by yourself." });
+    }
+
+    // Check if the user has already saved the note
+    const isNoteSaved = note.saved_by.includes(user._id);
+
+    if (isNoteSaved) {
+      return res.status(400).json({ message: "Note is already saved by the user." });
+    }
+
+    // Save the note for the user
+    note.saved_by.push(user._id);
+    await note.save();
+
+    res.json({ message: "Note saved successfully." });
+  } catch (err) {
+    const error = new HttpError('An error occurred while saving the note.', 500);
+    return next(error);
+  }
+};
+
+
+//get saved notes of a user
+const getSavedNotesByUserId = async (req, res, next) => {
+  const { user_id } = req.params;
+
+  try {
+    const notes = await noteModel.find({ saved_by: user_id })
+      .populate('course_id', 'title')
+      .populate('user_id', 'user_name')
+      .select('note_id title');
+
+    res.json(notes);
+  } catch (err) {
+    const error = new HttpError('An error occurred while fetching notes.', 500);
+    return next(error);
+  }
+};
+
+
 //get all notes
 const getNotes = async (req, res, next) => {
   try {
@@ -205,4 +288,8 @@ exports.getNotesByCourseTitle = getNotesByCourseTitle;
 exports.createNote = createNote;
 exports.updateNote = updateNote;
 exports.deleteNote = deleteNote;
+
+exports.saveNote = saveNote;
+exports.getSavedNotesByUserId = getSavedNotesByUserId;
+
 exports.getNotes = getNotes;
