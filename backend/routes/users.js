@@ -10,7 +10,7 @@ router.post("/signup", usersController.signup);
 router.post("/login", usersController.login);
 
 //pass the middellware function  , any routes after this check will be reatched with valid token
-router.use(checkAuth)
+// router.use(checkAuth)
 router.get("/", usersController.getUsers);
 
 

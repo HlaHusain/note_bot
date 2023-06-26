@@ -2,12 +2,21 @@ const noteModel = require('../model/noteModel')
 const userModel = require('../model/userModel');
 const mongoose = require('mongoose');
 
-/*
+
 // Get all notes
-const getNotes = (req, res, next) => {
-    res.json(dummyData);
+const getNotes = async (req, res, next) => {
+  let notes;
+  try {
+    notes = await noteModel.find({}); //exclude password :)
+    res.json({ notes });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: "Fetching users failed , please try again later ." });
+  }
+  res.json({ notes});
 };
-*/
+
 
 // Get all notes by course_id: where isPublic = true
 const getPublicNotesByCourseId = async (req, res, next) => {
@@ -93,7 +102,7 @@ const getNoteByUserId = async (req, res, next) => {
     }
 
     try{
-
+// When do multiple operation , start the transaction , called session then if everything is successful commit the transation and the changes will be saved on the db
       const sess = await mongoose.startSession();
       sess.startTransaction();
       await createdNote.save({session: sess}); //add the note to the database
@@ -182,7 +191,7 @@ const deleteNote = async (req, res, next) => {
 };
 
 
-//exports.getNotes = getNotes;
+exports.getNotes = getNotes;
 exports.getPublicNotesByCourseId = getPublicNotesByCourseId;
 exports.getNoteByUserId = getNoteByUserId;
 exports.createNote = createNote;

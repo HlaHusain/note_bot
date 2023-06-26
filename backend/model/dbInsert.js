@@ -114,12 +114,12 @@ const widgets = [
 async function insertDB() {
 
   try {
-    // await userModel.insertMany(users)
-    // await noteModel.insertMany(notes)
-    // await ratingModel.insertMany(ratings)
-    // await sectionModel.insertMany(sections)
-    // await widgetModel.insertMany(widgets);
-    // await courseModel.insertMany(courses)
+    await userModel.insertMany(users)
+    await noteModel.insertMany(notes)
+    await ratingModel.insertMany(ratings)
+    await sectionModel.insertMany(sections)
+    await widgetModel.insertMany(widgets);
+    await courseModel.insertMany(courses)
 
     console.log("Successfully inserted to DB");
   } catch (err) {
