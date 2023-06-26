@@ -12,6 +12,9 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var fillRouter = require('./routes/fillDB');
 var notesRouter = require('./routes/notes');
+var coursesRouter = require('./routes/courses');
+var sectionsRouter = require('./routes/sections');
+var widgetsRouter = require('./routes/widgets');
 
 var app = express();
 
@@ -35,7 +38,10 @@ res.setHeader('Access-Control-Allow-Methods' , 'GET,POST,PATCH,DELETE')
 next()
 })
 
-
+app.use((req, res, next) => {
+  res.setHeader('Content-Security-Policy', "default-src 'self'");
+  next();
+});
 
 app.use(bodyParser.json()); // support json encoded bodies 
 
@@ -44,6 +50,9 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/fill', fillRouter);
 app.use('/notes', notesRouter);
+app.use('/courses', coursesRouter);
+app.use('/sections', sectionsRouter);
+app.use('/widgets', widgetsRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

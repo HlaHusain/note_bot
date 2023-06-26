@@ -1,6 +1,6 @@
 const mongoose = require("./dbconnection.js");
 // Initialize parameters
-const collectionName_sections = process.env.DB_COLLECTION_SECTIONS;
+const collectionName_sections = 'sections';
 //define structure of the documents in a collection
 const sectionSchema = new mongoose.Schema({
 
@@ -11,9 +11,14 @@ const sectionSchema = new mongoose.Schema({
     required: true,
   },
   note_id: {
-    type: String,
+    type: mongoose.Types.ObjectId,
     required: true,
+    ref:'notes'
   },
+  widgets: [{
+    type: mongoose.Types.ObjectId,
+    ref:'widgets'
+  }],
 });
 
 const sectionModel = mongoose.model(collectionName_sections, sectionSchema);

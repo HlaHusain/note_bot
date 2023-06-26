@@ -1,6 +1,6 @@
 const mongoose = require("./dbconnection.js");
 // Initialize parameters
-const collectionName_users = process.env.DB_COLLECTION_USERS;
+const collectionName_users = 'users';
 
 //define structure of the documents in a collection
 const userSchema = new mongoose.Schema({
@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
   },
   notes: [{ 
     type: mongoose.Types.ObjectId,
-    ref:'Note'
+    ref:'notes'
   }],
 });
 
