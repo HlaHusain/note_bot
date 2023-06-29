@@ -1,7 +1,7 @@
 const User = require("../model/userModel");
 const bcrypt = require("bcryptjs");
 //JSON Web Tokens (JWTs) are the most common way of implementing authentication in Single-Page-Applications.
-const jwt = require("jsonwebtoken");
+//const jwt = require("jsonwebtoken");
 
 const users = [
   {
@@ -31,13 +31,12 @@ const getUsers = async (req, res, next) => {
   let users;
   try {
     users = await User.find({}, "-password"); //exclude password :)
-    // res.json({ users });
+    res.json({ users: users.map((user) => user.toObject({ getters: true }))});
   } catch (err) {
     return res
       .status(500)
       .json({ message: "Fetching users failed , please try again later ." });
   }
-  res.json({users});
 };
 
 const signup = async (req, res, next) => {
@@ -83,6 +82,7 @@ const signup = async (req, res, next) => {
       .json({ message: "Signup failed ! , please try again " });
   }
 
+  /*
   //create string token with userId , email with privatekey and experation time
   let token;
   try {
@@ -96,7 +96,7 @@ const signup = async (req, res, next) => {
       .status(500)
       .json({ message: "Signup failed ! , please try again " });
   }
-
+*/
   res
     .status(201) //201 is for created
     .json({ user: createdUser.id, email: createdUser.email, token: token });
@@ -136,6 +136,7 @@ const login = async (req, res, next) => {
       .json({ message: "Invalid credentials  , Could not log you in " });
   }
 
+  /*
   //create string token with userId , email with privatekey and experation time
   let token;
   try {
@@ -149,11 +150,12 @@ const login = async (req, res, next) => {
       .status(500)
       .json({ message: "Logging in failed ! , please try again " });
   }
+  */
 
   res.json({
     userId: existingUser.id,
     email: existingUser.email,
-    token: token,
+    //token: token,
   });
 };
 

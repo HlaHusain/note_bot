@@ -1,7 +1,7 @@
 const mongoose = require("./dbconnection.js");
 const WIDGET_TYPES = require("./widgetTypes");
 // Initialize parameters
-const collectionName_widgets = process.env.DB_COLLECTION_WIDGETS;
+const collectionName_widgets = 'widgets';
 
 
 
@@ -18,8 +18,9 @@ const widgetSchema = new mongoose.Schema({
     required: true,
   },
   section_id: {
-    type: String,
+    type: mongoose.Types.ObjectId,
     required: true,
+    ref: 'sections',
   },
 });
 
