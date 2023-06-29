@@ -31,13 +31,12 @@ const getUsers = async (req, res, next) => {
   let users;
   try {
     users = await User.find({}, "-password"); //exclude password :)
-    res.json({ users });
+    res.json({ users: users.map((user) => user.toObject({ getters: true }))});
   } catch (err) {
     return res
       .status(500)
       .json({ message: "Fetching users failed , please try again later ." });
   }
-  res.json({ users: users.map(user.toObject({ getters: true })) });
 };
 
 const signup = async (req, res, next) => {

@@ -4,7 +4,7 @@ var cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
 var logger = require("morgan");
 const HttpError = require("./model/http-error");
-var cors = require('cors')
+var cors = require("cors");
 
 require("dotenv").config();
 
@@ -40,11 +40,8 @@ app.use((req, res, next) => {
 
   next();
 });
-
-app.use(cors({credentials: true}));
+app.use(cors({ credentials: true }));
 app.options("*", cors());
-
-
 
 app.use((req, res, next) => {
   res.setHeader("Content-Security-Policy", "default-src 'self'");
