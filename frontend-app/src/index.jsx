@@ -14,6 +14,7 @@ import { AuthProvider } from "./contexts/AuthProvider";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { GuestsRoute } from "./components/GuestsRoute";
 
+
 const Auth = () => {
   return (
     <>
@@ -47,12 +48,12 @@ const router = createBrowserRouter([
       },
 
       {
-        element: [<ProtectedRoute />, <MenuComponent />],
+        element: [<ProtectedRoute />, <MenuComponent />, <Outlet />],
         children: [...noteRoutes, ...courseRoutes],
       },
 
       {
-        element: [<GuestsRoute/>, <LayoutHeader />,],
+        element: [<GuestsRoute/>, <LayoutHeader />],
         children: [
           {
             path: "/signup",
