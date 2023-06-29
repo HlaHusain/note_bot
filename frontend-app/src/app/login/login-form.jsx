@@ -6,7 +6,11 @@
 // import { Button, TextField } from "@mui/material";
 // import { isEmpty, isEmail } from "../../../utils/validators";
 
+import { useAuth } from "../../contexts/AuthProvider";
+
 export const LoginForm = () => {
+
+  const {login ,isAuthorized ,token ,user} = useAuth();
 
   return(
     <>

@@ -16,7 +16,7 @@ import { Logo } from "./Logo";
 // import { LinkComponent as Link } from "./Link";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../contexts/AuthProvider";
 
 const pages = [
   { label: "notes", link: "/notes" },

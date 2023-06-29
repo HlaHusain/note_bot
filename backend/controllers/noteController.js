@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const HttpError = require('../model/http-error');
 //const { validationResult } = require('express-validator');
 
+
 //Get all notes by user_id and course_id
 const getNotesByUserIdAndCourseId = async (req, res, next) => {
   const { user_id, course_id } = req.params;

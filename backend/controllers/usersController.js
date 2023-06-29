@@ -40,7 +40,9 @@ const getUsers = async (req, res, next) => {
 };
 
 const signup = async (req, res, next) => {
+
   const { user_name, email, password, study_field } = req.body;
+
   let existingUser;
   try {
     existingUser = await User.findOne({ email: email });
@@ -50,7 +52,7 @@ const signup = async (req, res, next) => {
       .json({ message: "Signup failed , please try later" });
   }
 
-  if(existingUser.email) {
+  if(existingUser && existingUser.email) {
     return res
       .status(422) //422 is for invalid input
       .json({ message: "User exists alreay , please login instead " });
