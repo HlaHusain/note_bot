@@ -10,6 +10,7 @@ const getCoursesByUserId = async (req, res, next) => {
     const { user_id } = req.params;
   
     try {
+      //Populate to Replace the user id in a document with the data of that user, nested Population
       const user = await userModel.findById(user_id).populate({
         path: 'notes',
         populate: { path: 'course_id' } // Populate the course reference for each note

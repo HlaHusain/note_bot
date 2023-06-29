@@ -1,7 +1,9 @@
 import { url } from "../../../config";
 
-export const notes = async (token) => {
-  const response = await fetch(`${url}/notes/get`, {
+export const getNotes = async (token,userId) => {
+
+
+  const response = await fetch(`${url}/notes/${userId}`, {
     method: "GET",
     headers: {
       "Content-type": "application/json",
@@ -9,7 +11,19 @@ export const notes = async (token) => {
     },
   });
 
-  const notes = await response.json();
 
-  return notes;
+
+  const notes = await response.json();
+  console.log('notes = ',notes['notes'])
+  console.log(response)
+
+if(!response.ok){
+  let error = new Error("Http status code" + response.status )
+  error.data=notes;
+  error.status=response.status ;
+  error.message=response.message;
+  // throw error
+  }
+
+  return notes['notes'];
 };

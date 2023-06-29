@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Style } from "@mui/icons-material";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Unstable_Grid2";
 import { Button, Container, Stack, TextField } from "@mui/material";
@@ -51,7 +51,7 @@ useEffect(()=>{
     const res = await signup(data.email,data.password,data.username,data.study);
     console.log('res == ', res)
     localStorage.setItem("token" , res.token )
-    localStorage.setItem("user" , res.user )
+    localStorage.setItem("user" , res.userId )
     setResponse(res)
     doRedirect(true)
     }catch(error){
@@ -200,6 +200,19 @@ useEffect(()=>{
             >
               Register
             </Button>
+
+            <Box   sx={{
+                    color: "#6FADE6",
+                    // border: "solid 1px #fecaca",
+                    marginBottom: 2,
+                    fontSize: 14,
+                    display:'flex',
+                    justifyContent: "center",
+                    padding:1,
+                  }}>
+              <Box>Already have account ? </Box>
+              <Link to='/login' sx={{color: "#6FADE6",textDecoration: "none",}}> Login</Link>
+              </Box>
 
             {/* {(response && response["status"] === 400 || response["status"] === 401) && (
               <Box

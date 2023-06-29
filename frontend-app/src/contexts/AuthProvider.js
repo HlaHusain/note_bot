@@ -17,16 +17,29 @@ const getStorageObject = (user) => {
 };
 
 export function AuthProvider({ children }) {
-  let [user, setUser] = useState(() => getStorageObject("user"));
+  let [user, setUser] = useState(() => localStorage.getItem("user"));
   let [token, setToken] = useState(() => localStorage.getItem("token"));
 
   const navigate = useNavigate();
-  const isAuthorized = Boolean(token);
 
-  const login = useCallback(
-    async (user) => {
-      localStorage.setItem("user", user);
-      setUser(user)
+  const isAuthorized = Boolean(token);
+  console.log(
+    "token = ",
+    localStorage.getItem("token"),
+    token,
+    "user = ",
+    localStorage.getItem("user"),
+    user
+  );
+
+  const saveUser = useCallback(
+    async ({ token, userId }) => {
+      setUser(userId);
+      setToken(token);
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", userId);
+
       navigate("/notes");
     },
     [navigate]
@@ -34,8 +47,8 @@ export function AuthProvider({ children }) {
   const logout = useCallback(() => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    setToken(undefined)
-    setUser(undefined)
+    setToken(undefined);
+    setUser(undefined);
     navigate("/login");
 
     // fetch(`${url}/logout`, {
@@ -53,17 +66,15 @@ export function AuthProvider({ children }) {
     // })
   }, [navigate]);
 
-  console.log("token", token);
-
   const value = useMemo(
     () => ({
       token,
       user,
-      login,
+      saveUser,
       logout,
       isAuthorized,
     }),
-    [isAuthorized, login, logout, token, user]
+    [isAuthorized, saveUser, logout, token, user]
   );
 
   console.log(children);
