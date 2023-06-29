@@ -1,22 +1,16 @@
 const noteModel = require('../model/noteModel')
 const userModel = require('../model/userModel');
+const courseModel = require('../model/courseModel');
 const mongoose = require('mongoose');
+const HttpError = require('../model/http-error');
+//const { validationResult } = require('express-validator');
 
-
+/*
 // Get all notes
-const getNotes = async (req, res, next) => {
-  let notes;
-  try {
-    notes = await noteModel.find({}); //exclude password :)
-    res.json({ notes });
-  } catch (err) {
-    return res
-      .status(500)
-      .json({ message: "Fetching users failed , please try again later ." });
-  }
-  res.json({ notes});
+const getNotes = (req, res, next) => {
+    res.json(dummyData);
 };
-
+*/
 
 // Get all notes by course_id: where isPublic = true
 const getPublicNotesByCourseId = async (req, res, next) => {
@@ -24,176 +18,296 @@ const getPublicNotesByCourseId = async (req, res, next) => {
   let publicNotes;
 
   try {
-    publicNotes = await noteModel.find({ isPublic: true, course_id: course_id });
-  } catch (err) {
-    console.log(err);
-    return res
-      .status(500)
-      .json({ message: "Fetching public notes failed, please try again later." });
-  }
+    const user = await userModel.findById(user_id).populate('notes');
 
-  res.json({ notes: publicNotes.map(note => note.toObject({ getters: true })) });
+    if (!user.notes || user.notes.length === 0) {
+      return res.status(404).json({ message: "Could not find notes for the provided user id." });
+    }
+
+    res.json({ notes: user.notes.filter(note => note.course_id.toString() === course_id)
+                                .map(note => note.toObject({ getters: true })) });
+  } catch (err) {
+    const error = new HttpError( 'An error occurred while fetching notes. ', 500);
+    return next(error);
+  }
 };
 
 
+
+// const getNoteByUserId = async (req, res, next) => {
+//   const { user_id } = req.params;
+
+//   try {
+//     const notes = await noteModel.find({ user_id: { $in: user_id } });
+
+
+//     if (!notes || notes.length === 0) {
+//       return res.status(404).json({ message: "Could not find notes for the provided user id." });
+//     }
+
+//     res.json({ notes: notes.map(note => note.toObject({ getters: true })) });
+//   } catch (err) {
+//     const error = new HttpError( 'An error occurred while fetching notes. ', 500);
+//     return next(error);
+//   }
+// };
+
 // Get user notes by user_id
-const getNoteByUserId = async (req, res, next) => {  
+const getNoteByUserId = async (req, res, next) => {
+  const { user_id } = req.params;
 
-  //get id from params url
-    const user_id = req.params.user_id;
+  console.log(user_id , 'user_id')
 
-    //let notes;
-    let userWithNotes;
+  try {
+    const user = await userModel.findById(user_id).populate('notes');
 
-    try{
-      //notes = await noteModel.find({user_id: user_id});
-      
-      userWithNotes = await userModel.findById(user_id).populate('notes');
-    
-    }catch(err){
-      console.log(err);
-      return res
-      .status(500)
-      .json({ message: "Getting notes failed , please try again later ." });
-    }
+    console.log('user.notes = ' , user)
 
-    //if(!notes || notes.length === 0){ ... }
-    if(!userWithNotes || userWithNotes.notes.length === 0){
-      return res
-      .status(404)
-      .json({ message: "Could not find notes for the provided user id." });
+    if (!user.notes || user.notes.length === 0) {
+      return res.status(404).json({ message: "Could not find notes for the provided user id." });
     }
     
-    //map() applies a function to every element of an array
-    //Getters: true means that the object will have an id field instead of _id
-    //res.json({notes: notes.map(note => note.toObject({getters: true}))});
-    
-    res.json({notes: userWithNotes.notes.map(note => note.toObject({getters: true}))});
-  };
+    //res.json({ notes: user.notes.map(note => note.toObject({ getters: true })) });
+     // Group notes by course ID
+     const groupedNotes = {};
+     user.notes.forEach((note) => {
+       const courseId = note.course_id._id.toString();
+ 
+       if (!groupedNotes[courseId]) {
+         groupedNotes[courseId] = {
+           course_id: note.course_id._id,
+           course_title: note.course_id.title,
+           notes: []
+         };
+       }
+ 
+       groupedNotes[courseId].notes.push(note);
+     });
+ 
+     // Convert the grouped notes object to an array
+     const groupedNotesArray = Object.values(groupedNotes);
+ 
+     res.json({ notes: groupedNotesArray });
+  } catch (err) {
+    const error = new HttpError( 'An error occurred while fetching notes. ', 500);
+    return next(error);
+  }
+};
+
+
+// Get all notes by course title
+const getNotesByCourseTitle = async (req, res, next) => {
+  const searchKeyword = req.params.keyword;
+
+  try {
+    // Get all courses that match the search keyword
+    const courses = await courseModel.find({ title: { $regex: searchKeyword, $options: 'i' } });
+    const courseIds = courses.map(course => course._id);
+
+    // Get all notes that match the course ids
+    const notes = await noteModel.find({ course_id: { $in: courseIds } })
+      .populate('course_id', 'title')
+      .populate('user_id', 'user_name')
+      .select('note_id title');
+
+    res.json(notes);
+  } catch (err) {
+    const error = new HttpError( 'An error occurred while fetching notes. ', 500);
+    return next(error);
+  }
+};
+
 
 
 // Create a new note
- const createNote = async (req, res, next) => {
+const createNote = async (req, res, next) => {
+  const { user_id, title, isPublic, course_id } = req.body;
 
-    const {user_id, title, isPublic, course_id}  = req.body;
-   
-    const createdNote = new noteModel({
-      user_id: user_id,
-      title: title,
-      isPublic: isPublic,
-      course_id: course_id,
-    });
 
-    let user;
-    try{
+  console.log(user_id, title, isPublic, course_id )
 
-      user = userModel.findById(user_id); // to check if the user exists
-
-    }catch(err){
-      return res
-      .status(500)
-      .json({ message: "Fetching notes failed , please try again later ." });
+  try {
+    // Input validation
+    if (!user_id || !title || !course_id) {
+      return res.status(400).json({ message: "Missing required fields." });
     }
 
-    if(!user){
-      return res
-      .status(404)
-      .json({ message: "Could not find user for the provided id." });
+    const [user, course] = await Promise.all([
+      userModel.findById(user_id),
+      courseModel.findById(course_id),
+    ]);
+
+    // Check if user and course exist
+    if (!user) {
+      return res.status(404).json({ message: "Could not find user for the provided id." });
+    }
+    if (!course) {
+      return res.status(404).json({ message: "Could not find course for the provided id." });
     }
 
     try{
-// When do multiple operation , start the transaction , called session then if everything is successful commit the transation and the changes will be saved on the db
+
       const sess = await mongoose.startSession();
       sess.startTransaction();
+      const createdNote = new noteModel({
+        title,
+        notes: noteIds 
+      });
       await createdNote.save({session: sess}); //add the note to the database
       user.notes.push(createdNote); //push the note to the user
       await user.save({session: sess}); //save the user
       await sess.commitTransaction();
 
-    }catch(err){
-      return res
-      .status(500)
-      .json({ message: "Fetching notes failed , please try again later ." });
+      console.log('createdNote' , createdNote)
+
+      res.status(201).json({ message: "Note created!", note: createdNote });
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
     }
-    //Status 201 means created
-    res.status(201).json({message: "Note created!", note: createdNote});
+  } catch (err) {
+    const error = new HttpError( 'Creating note failed, please try again later.', 500);
+    return next(error);
+  }
 };
 
 
 //update note
 const updateNote = async (req, res, next) => {
-  const {title, isPublic, course_id}  = req.body;
+  const { title, isPublic, course_id } = req.body;
   const note_id = req.params.note_id;
 
-  let note;
-  try{
-    note = await noteModel.findById(note_id);
-  }catch(err){
-    console.log(err);
-    return res
-    .status(500)
-    .json({ message: "Updating note failed , please try again later ." });
+  try {
+    let note = await noteModel.findById(note_id);
+
+    if (!note) {
+      return res.status(404).json({ message: "Could not find note for the provided id." });
+    }
+
+    note.title = title;
+    note.isPublic = isPublic;
+    note.course_id = course_id;
+
+    note = await note.save();
+
+    res.status(200).json({ message: "Note updated!", note: note.toObject({ getters: true }) });
+  } catch (err) {
+    const error = new HttpError( 'Updating note failed, please try again later.', 500);
+    return next(error);
   }
-
-  note.title = title;
-  note.isPublic = isPublic;
-  note.course_id = course_id;
-
-  try{
-    await note.save(); 
-  }catch(err){
-    console.log(err);
-    return res
-    .status(500)
-    .json({ message: "Updating note failed , please try again later ." });
-  }
-
-  res.status(200).json({message: "Note updated!", note: note.toObject({getters: true})});
 };
+
 
 //delete note
 const deleteNote = async (req, res, next) => {
+  const { user_id, course_id } = req.params;
   const note_id = req.params.note_id;
 
-  let note;
-  try{
-    place = await noteModel.findById(note_id).populate('user_id'); // the user_id allows us to access the user who created this note
-  }catch(err){
-    console.log(err);
-    return res
-    .status(500)
-    .json({ message: "Deleting note failed , please try again later ." });
+  try {
+    const user = await userModel.findById(user_id);
+    const course = await courseModel.findById(course_id);
+
+    if (!user) {
+      return res.status(404).json({ message: "Could not find user for the provided id." });
+    }
+
+    if (!course) {
+      return res.status(404).json({ message: "Could not find course for the provided id." });
+    }
+
+    const note = await noteModel.findOneAndDelete({
+      _id: note_id,
+      user_id: user._id,
+      course_id: course._id,
+    });
+
+    if (!note) {
+      return res.status(404).json({ message: "Could not find note for the provided id." });
+    }
+
+    // Remove the note reference from user and course
+    user.notes.pull(note._id);
+    course.notes.pull(note._id);
+
+    await Promise.all([user.save(), course.save()]);
+
+    res.json({ message: "Note deleted!", note });
+  } catch (err) {
+    const error = new HttpError( 'Deleting note failed, please try again later.', 500);
+    return next(error);
   }
+};
 
-  if(!note){
-    return res
-    .status(404)
-    .json({ message: "Could not find note for this id." });
+// save note
+const saveNote = async (req, res, next) => {
+  const { user_id, note_id } = req.params;
+
+  try {
+    // Find the user by user_id
+    const user = await userModel.findById(user_id);
+    
+    if (!user) {
+      return res.status(404).json({ message: "Could not find user for the provided id." });
+    }
+
+    // Find the note by note_id
+    const note = await noteModel.findById(note_id);
+    
+    if (!note) {
+      return res.status(404).json({ message: "Could not find note for the provided id." });
+    }
+    
+    // Check if the user who wrote the note is different from the user trying to save it
+    if (note.user_id.toString() === user._id.toString()) {
+      return res.status(400).json({ message: "Cannot save a note written by yourself." });
+    }
+
+    // Check if the user has already saved the note
+    const isNoteSaved = note.saved_by.includes(user._id);
+
+    if (isNoteSaved) {
+      return res.status(400).json({ message: "Note is already saved by the user." });
+    }
+
+    // Save the note for the user
+    note.saved_by.push(user._id);
+    await note.save();
+
+    res.json({ message: "Note saved successfully." });
+  } catch (err) {
+    const error = new HttpError('An error occurred while saving the note.', 500);
+    return next(error);
   }
-
-
-  try{
-
-    const sess = await mongoose.startSession();
-    sess.startTransaction();
-    await note.remove({session: sess}); //remove the note from the database
-    note.user_id.notes.pull(note); //pull the note from the user 
-    await note.user_id.save({session: sess}); //save the user
-    await sess.commitTransaction();
-
-  }catch(err){
-    return res
-    .status(500)
-    .json({ message: "Deleting note failed , please try again later ." });
-  }
-
-  res.status(200).json({message: "Note Deleted!", note: note.toObject({getters: true})});
 };
 
 
-exports.getNotes = getNotes;
+//get saved notes of a user
+const getSavedNotesByUserId = async (req, res, next) => {
+  const { user_id } = req.params;
+
+  try {
+    const notes = await noteModel.find({ saved_by: user_id })
+      .populate('course_id', 'title')
+      .populate('user_id', 'user_name')
+      .select('note_id title');
+
+    res.json(notes);
+  } catch (err) {
+    const error = new HttpError('An error occurred while fetching notes.', 500);
+    return next(error);
+  }
+};
+
+
+//exports.getNotes = getNotes;
 exports.getPublicNotesByCourseId = getPublicNotesByCourseId;
 exports.getNoteByUserId = getNoteByUserId;
+exports.getNotesByCourseTitle = getNotesByCourseTitle;
 exports.createNote = createNote;
 exports.updateNote = updateNote;
 exports.deleteNote = deleteNote;
+
+exports.saveNote = saveNote;
+exports.getSavedNotesByUserId = getSavedNotesByUserId;

@@ -31,16 +31,17 @@ const getUsers = async (req, res, next) => {
   let users;
   try {
     users = await User.find({}, "-password"); //exclude password :)
-    // res.json({ users });
+    res.json({ users });
   } catch (err) {
     return res
       .status(500)
       .json({ message: "Fetching users failed , please try again later ." });
   }
-  res.json({users});
+  res.json({ users: users.map(user.toObject({ getters: true })) });
 };
 
 const signup = async (req, res, next) => {
+  console.log('test test')
 
   const { user_name, email, password, study_field } = req.body;
 
@@ -68,6 +69,7 @@ const signup = async (req, res, next) => {
       .json({ message: "Could not create user , please try again" });
   }
 
+
   const createdUser = new User({
     user_name,
     email,
@@ -75,17 +77,20 @@ const signup = async (req, res, next) => {
     study_field,
   });
 
+
   try {
     await createdUser.save();
+
   } catch (err) {
     return res
       .status(500)
-      .json({ message: "Signup failed ! , please try again " });
+      .json({ message: "Signup failed ! , please try again ... " });
   }
 
   //create string token with userId , email with privatekey and experation time
   let token;
   try {
+
     token = jwt.sign(
       { userId: createdUser.id, email: createdUser.email },
       "dont share",
@@ -98,7 +103,7 @@ const signup = async (req, res, next) => {
   }
 
   res
-    .status(201) //201 is for created
+    .status(201) //201 is for cr23eated
     .json({ user: createdUser.id, email: createdUser.email, token: token });
 };
 
@@ -107,6 +112,8 @@ const login = async (req, res, next) => {
   let existingUser;
   try {
     existingUser = await User.findOne({ email: email });
+    console.log(existingUser , 'existingUser' , email, password)
+
   } catch (err) {
     return res
       .status(500)
@@ -136,19 +143,23 @@ const login = async (req, res, next) => {
       .json({ message: "Invalid credentials  , Could not log you in " });
   }
 
+
   //create string token with userId , email with privatekey and experation time
   let token;
   try {
     token = jwt.sign(
-      { userId: createdUser.id, email: createdUser.email },
+      { userId: existingUser.id, email: existingUser.email },
       "dont share",
       { expiresIn: "1h" }
     );
+    console.log('token' , token)
   } catch (err) {
+    console.log('err' , err)
     return res
       .status(500)
-      .json({ message: "Logging in failed ! , please try again " });
+      .json({ message: "Logging in failed ! , please try again ... " });
   }
+
 
   res.json({
     userId: existingUser.id,
