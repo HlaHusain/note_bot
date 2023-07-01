@@ -15,7 +15,7 @@ router.get('/users/:user_id/savednotes', noteController.getSavedNotesByUserId); 
 router.post('/users/:user_id/notes/:note_id/save', noteController.saveNote); // Clicking on the save button in the Search page
 
 // test route
-router.get('/test', noteController.getNotes);
+// router.get('/test', noteController.getNotes);
 
 //export the router 
 module.exports = router;

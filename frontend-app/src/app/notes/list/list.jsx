@@ -21,6 +21,7 @@ import {
   IconButton,
   Rating,
 } from "@mui/material";
+import { PageHeader } from "../../../components/PageHeader";
 
 export const NotesList = () => {
   const notes1 = [
@@ -67,81 +68,29 @@ export const NotesList = () => {
 
   return (
     <Container maxWidth="md" sx={{ marginTop: 5 }}>
-      <Grid
-        container
-        alignItems="center"
-        justifyContent="space-between"
-        sx={{ marginBottom: 2 }}
-      >
-        <Grid item>
-          <Typography
-            variant="h5"
-            component="h1"
-            sx={{ marginBottom: "0" }}
-            gutterBottom
-          >
-            My Notes
-          </Typography>
-        </Grid>
-        <Grid item>
-          <Button
-            color="primary"
-            startIcon={<AddIcon />}
-            variant="contained"
-            size="small"
-            sx={{
-              background: "#ED7D31",
-              borderRadius: 1,
-              color: "#FFFFFF",
-              alignItems: "left",
-              paddingX: 2,
-              paddingY: 0.5,
-              border: "0",
-              marginLeft: 2,
-              "&:hover": {
-                color: "#fff",
-                background: "#ed955a",
-                border: "0",
-              },
-            }}
-          >
-            Add Note
-          </Button>
-          <Button
-            color="primary"
-            startIcon={<AddIcon />}
-            variant="contained"
-            size="small"
-            sx={{
-              background: "#ED7D31",
-              borderRadius: 1,
-              color: "#FFFFFF",
-              alignItems: "left",
-              paddingX: 2,
-              paddingY: 0.5,
-              border: "0",
-              marginLeft: 2,
-              "&:hover": {
-                color: "#fff",
-                background: "#ed955a",
-                border: "0",
-              },
-            }}
-          >
-            Add Course
-          </Button>
-        </Grid>
-      </Grid>
-      <Divider
-        component="div"
-        role="presentation"
-        sx={{
-          marginBottom: 4,
-          borderBottomWidth: "2px",
-          borderBottomStyle: "solid",
-          borderBottomColor: "#D9D9D9",
-        }}
+
+      <PageHeader
+        title="My Notes"
+        actions={[
+          {
+            label: "Add Note",
+            startIcon:<AddIcon/> ,
+            onClick:()=>{},
+            color:'primary',
+            variant: "outlined",
+            
+            
+          },
+          {
+            label: "Add Course",
+            startIcon:<AddIcon/> ,
+            onClick:()=>{},
+            disableElevation:true
+          },
+        ]}
       />
+      
+
       <Grid container spacing={2} justifyContent="center">
         <Grid item sx={{ maxWidth: 1400, width: "100%" }}>
           <Grid container sx={{ px: 2 }}>
