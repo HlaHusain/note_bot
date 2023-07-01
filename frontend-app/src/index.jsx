@@ -13,7 +13,8 @@ import { MenuComponent } from "./components/Menu";
 import { AuthProvider } from "./contexts/AuthProvider";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { GuestsRoute } from "./components/GuestsRoute";
-
+import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
+import { theme } from "./theme";
 
 const Auth = () => {
   return (
@@ -53,7 +54,7 @@ const router = createBrowserRouter([
       },
 
       {
-        element: [<GuestsRoute/>, <LayoutHeader />],
+        element: [<GuestsRoute />, <LayoutHeader />],
         children: [
           {
             path: "/signup",
@@ -70,6 +71,8 @@ const router = createBrowserRouter([
 ]);
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <ThemeProvider theme={theme}>
+      <RouterProvider router={router} />
+    </ThemeProvider>
   </React.StrictMode>
 );
