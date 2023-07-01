@@ -4,6 +4,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var logger = require('morgan');
 const HttpError = require('./model/http-error');
+const cors = require('cors');
 
 require('dotenv').config();
 
@@ -37,6 +38,9 @@ res.setHeader('Access-Control-Allow-Methods' , 'GET,POST,PATCH,DELETE')
 
 next()
 })
+
+app.use(cors({credentials:true}));
+app.options('*', cors());
 
 app.use((req, res, next) => {
   res.setHeader('Content-Security-Policy', "default-src 'self'");
