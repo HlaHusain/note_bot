@@ -6,7 +6,8 @@ import AddIcon from '@mui/icons-material/Add';
 import { Avatar, Divider } from "@mui/material";
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import TitleIcon from '@mui/icons-material/Title';
-import { useNavigate } from "react-router-dom";
+import LiveTvIcon from '@mui/icons-material/LiveTv';
+
 import {
   Container,
   Typography,
@@ -55,7 +56,7 @@ export const CourseNotesList = () => {
         <Grid container spacing={2} sx={{ p: 2 }}>
           {notes.map((note) => (
             <Grid item={true} xs={12} sm={6} md={4} key={note.id}>
-              <Card sx={{ bgcolor: "#E8E8E8", borderRadius: 2,maxHeight:200,width:"100%",maxWidth:160,width:160 }}>
+              <Card sx={{ bgcolor: "#E8E8E8", borderRadius: 2,maxHeight:200,width:"100%",maxWidth:160,width:160,marginBottom:2 }}>
                 <CardHeader
                   action={
                     <Box sx={{ display: "flex" }}>
@@ -65,10 +66,13 @@ export const CourseNotesList = () => {
                       <Avatar sx={{ bgcolor: "#ED7D31", width: 25, height: 25 }}>
                         <PictureAsPdfIcon sx={{ fontSize: 15 }} />
                       </Avatar>
+                      <Avatar sx={{ bgcolor: "#F91313", width: 25, height: 25 , marginLeft: 1}}>
+                        <LiveTvIcon sx={{ fontSize: 15 }} />
+                      </Avatar>
                     </Box>
                   }
                 />
-                <CardContent sx={{ padding: 3, color: "#4662A6",maxWidth:"100%", textAlign:"center" }}>
+                <CardContent sx={{ padding: 4 , color: "#ED7D31",maxWidth:"100%", textAlign:"center" }}>
                   <Typography
                     variant="h5"
                     fontSize={18}
