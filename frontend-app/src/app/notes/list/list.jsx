@@ -25,28 +25,46 @@ import {
 export const NotesList = () => {
 
   const notes = [
-    { id: 1, title: "Topic 1: Status", rating: 4 },
-    { id: 2, title: "Note 2", rating: 3 },
-    { id: 3, title: "Note 3", rating: 5 },
-    { id: 4, title: "Note 4", rating: 6 },
-    { id: 5, title: "Note 5", rating: 4 },
-    { id: 6, title: "Note 6", rating: 3 },
-    { id: 7, title: "Note 7", rating: 5 },
-    { id: 8, title: "Note 8", rating: 6 },
+    { id: 1, by: "hadeel", title: "Topic 1: Status", rating: 4 },
+    { id: 2, by: "Hla", title: "Note 2", rating: 3 },
+    { id: 3, by: "Mohammad", title: "Note 3", rating: 5 },
+    { id: 4, by: "Muath", title: "Note 4", rating: 6 },
+    { id: 5, by: "Ahmad", title: "Note 5", rating: 4 },
+    { id: 6, by: "Jusif", title: "Note 6", rating: 3 },
+    { id: 7, by: "Tariq", title: "Note 7", rating: 5 },
+    { id: 8, by: "Amer", title: "Note 8", rating: 6 },
   ];
+  const notes2 = [
+    { id: 9, by: "hadeel", title: "Topic 1: Status", rating: 4 },
+    { id: 10, by: "Hla", title: "Note 2", rating: 3 },
+    { id: 11, by: "Mohammad", title: "Note 3", rating: 5 },
+    { id: 12, by: "Muath", title: "Note 4", rating: 6 },
+    { id: 13, by: "Ahmad", title: "Note 5", rating: 4 },
+    { id: 14, by: "Jusif", title: "Note 6", rating: 3 },
+    { id: 15, by: "Tariq", title: "Note 7", rating: 5 },
+    { id: 16, by: "Amer", title: "Note 8", rating: 6 },
+  ];
+
 
   const navigate = useNavigate();
 
   const [showMore, setShowMore] = React.useState(false);
+  const [showMore2, setShowMore2] = React.useState(false);
   
   const handleShowMoreClick = () => {
     setShowMore(true);
     navigate("/notes/saved")
 
   };
+  const handleShowMoreClick2 = () => {
+    setShowMore2(true);
+    navigate("/notes/saved")
+
+  };
 
 
   const visibleNotes = showMore  ? handleShowMoreClick : notes.slice(0, 4);
+  const visibleNotes2 = showMore2  ? handleShowMoreClick : notes.slice(0, 4);
 
 
   return (
@@ -199,7 +217,7 @@ export const NotesList = () => {
             </Typography>
           </Grid>
           <Grid container spacing={2} sx={{ p: 2 }}>
-            {visibleNotes.map((note) => (
+            {visibleNotes2.map((note) => (
               <Grid item={true} xs={12} sm={6} md={4} key={note.id}>
                 <Card sx={{ bgcolor: "#E8E8E8", borderRadius: 2,maxHeight:200,width:"100%",maxWidth:160,width:160 }}>
                   <CardHeader
@@ -243,10 +261,10 @@ export const NotesList = () => {
                 </Card>
               </Grid>
             ))}
-            {!showMore && (
+            {!showMore2 && (
               <Grid item xs={12} sm={6} md={4} display={"flex"}>
                   <Button variant="text"
-                    onClick={handleShowMoreClick} // make show more true
+                    onClick={handleShowMoreClick2 } // make show more true
                     sx={{ color: "#3565BA", border: "none" }}
                     aria-label="Show More"
                   >
