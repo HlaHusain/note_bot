@@ -8,7 +8,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 export const ChatBot = () => {
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", height: "100%",
+    <Box sx={{height: "100%",
      width:388,border:"1px solid #C1C1C1", borderRadius: 4,
      margin:"0 auto"}}>
       <Box sx={{ flex: 1, overflowY: "auto", p: 2,maxHeight:"400px", height:"100%"}}>
