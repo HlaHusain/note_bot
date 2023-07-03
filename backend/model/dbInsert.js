@@ -7,28 +7,6 @@ const widgetModel = require("./widgetModel");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 const WIDGET_TYPES = require('./widgetTypes')
-
-const users = [
-  {
-    email: "hla@gmail.com",
-    password: "323!!FGLLWW!",
-    user_name: "Hla",
-    study_field: "Computer Engineering",
-  },
-  {
-    email: "test@gmail.com",
-    password: "323!!FGLLWW!",
-    user_name: "Hla",
-    study_field: "Computer Engineering ISE",
-  },
-  {
-    email: "test2@gmail.com",
-    password: "323!!FGLLWW!",
-    user_name: "Hla",
-    study_field: "Master of Computer Engineering",
-  },
-];
-
 const notes = [
   {
     archive_from_id: "",
@@ -47,6 +25,17 @@ const notes = [
     course_id: new ObjectId("648edb4dcd3c0c4995edf5f3"),
   },
 ];
+
+const users = [
+  {
+    email: "hlahussain@gmail.com",
+    password: "$2a$12$xyz9.IH/SdoSjLTytVoQsuVytTCXb//M8i.mzPaolXQmZmRLijglW",
+    user_name: "Hla",
+    study_field: "Computer Engineering",
+    notes:notes
+  },
+];
+
 
 const courses = [
   {
@@ -114,12 +103,12 @@ const widgets = [
 async function insertDB() {
 
   try {
-    // await userModel.insertMany(users)
-    // await noteModel.insertMany(notes)
-    // await ratingModel.insertMany(ratings)
-    // await sectionModel.insertMany(sections)
-    // await widgetModel.insertMany(widgets);
-    // await courseModel.insertMany(courses)
+    await userModel.insertMany(users)
+    await noteModel.insertMany(notes)
+    await ratingModel.insertMany(ratings)
+    await sectionModel.insertMany(sections)
+    await widgetModel.insertMany(widgets);
+    await courseModel.insertMany(courses)
 
     console.log("Successfully inserted to DB");
   } catch (err) {

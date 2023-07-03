@@ -5,67 +5,74 @@ import "./index.css";
 import { SignupForm } from "./app/signup/SignupForm";
 import ErrorPage from "./error-page";
 import { routes as noteRoutes } from "./app/notes";
-import {routes as courseRoutes} from "./app/courses"
+import { routes as courseRoutes } from "./app/courses";
 import { Header } from "./components/Header";
 import { LoginForm } from "./app/login/login-form";
 import { Home } from "./app/home";
 import { MenuComponent } from "./components/Menu";
+import { AuthProvider } from "./contexts/AuthProvider";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { GuestsRoute } from "./components/GuestsRoute";
+import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
+import { theme } from "./theme";
 
-const LayoutMenu = () => (
-  <>
-     <MenuComponent/>
-    <Outlet />
-  </>
-);
+const Auth = () => {
+  return (
+    <>
+      <AuthProvider>
+        <Outlet />
+      </AuthProvider>
+    </>
+  );
+};
 
 const LayoutHeader = () => (
   <>
-     <Header/>
+    <Header />
     <Outlet />
   </>
 );
 
 const router = createBrowserRouter([
   {
-    
-    element: <LayoutMenu />,
+    element: [<Auth />],
     errorElement: <ErrorPage />,
     children: [
       {
-        path: "/",
-        element: <Home />,
-        // errorElement:<ErrorPage/>,
+        element: [<LayoutHeader />],
+        children: [
+          {
+            path: "/",
+            element: <Home />,
+          },
+        ],
       },
-      ...noteRoutes,
-      ...courseRoutes,
-    ],
-  },
-  {
-    element: <LayoutHeader />,
-    errorElement: <ErrorPage />,
-    children: [
-      {
-        path: "/signup",
-        element: <SignupForm />,
-        // errorElement:<ErrorPage/>,
-      },
-      {
-        path: "/login",
-        element: <LoginForm />,
-        // errorElement:<ErrorPage/>,
-      },
-    ]
-    
-  },
 
-  {
-    path: "/logout",
-    element: <LoginForm />,
-    // errorElement:<ErrorPage/>,
+      {
+        element: [<ProtectedRoute />, <MenuComponent />, <Outlet />],
+        children: [...noteRoutes, ...courseRoutes],
+      },
+
+      {
+        element: [<GuestsRoute />, <LayoutHeader />],
+        children: [
+          {
+            path: "/signup",
+            element: <SignupForm />,
+          },
+          {
+            path: "/login",
+            element: <LoginForm />,
+          },
+        ],
+      },
+    ],
   },
 ]);
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <ThemeProvider theme={theme}>
+      <RouterProvider router={router} />
+    </ThemeProvider>
   </React.StrictMode>
 );

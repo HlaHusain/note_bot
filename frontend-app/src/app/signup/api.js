@@ -2,23 +2,31 @@ import {url} from "../../config"
 
 export const signup = async (email,password ,username,study) =>{
 
-    console.log({email,password ,username,study})
 
-const response = await fetch (`${url}/users/signup/` ,{
-    method:"POST",
-    headers:{
-        "Content-type":"application/json",
-    },
-    body:JSON.stringify({
+    console.log({
         user_name:username,
         email:email,
         password:password,
         study_field:study
     })
 
-})
+const response = await fetch (`${url}/users/signup/` ,{
+    method:"POST",
+    headers:{
+        "Content-type":"application/json",
+        "Access-Control-Allow-Origin": "*",
 
-console.log('response ===' , response)
+    },
+    body:JSON.stringify(
+        {
+            user_name:username,
+            email:email,
+            password:password,
+            study_field:study
+        }
+    )
+
+})
 
 const data =await response.json()
 
@@ -29,7 +37,7 @@ if(!response.ok){
     throw error;
 
 }
-console.log('data == ', data)
+
 return data
 
 }
