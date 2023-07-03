@@ -22,7 +22,7 @@ import {
 
 export const CourseNotesList = () => {
   const notes = [
-    { id: 1, by:"hadeel", title: "Topic 1: Status", rating: 4 },
+    { id: 1, by:"hadeel", title: "Topic 1: Status 33", rating: 4 },
     { id: 2, by:"Hla", title: "Note 2", rating: 3 },
     { id: 3, by:"Mohammad",title: "Note 3", rating: 5 },
     { id: 4, by:"Muath",title: "Note 4", rating: 6 },
@@ -81,6 +81,7 @@ export const CourseNotesList = () => {
                       wordBreak: "break-word",
                       textOverflow:"ellipsis",
                       whiteSpace:"nowrap",
+                      overflow: "hidden"
 
                     }}
                     gutterBottom

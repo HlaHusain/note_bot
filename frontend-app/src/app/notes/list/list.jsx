@@ -25,24 +25,24 @@ import {
 export const NotesList = () => {
 
   const notes = [
-    { id: 1, by: "hadeel", title: "Topic 1: Status", rating: 4 },
-    { id: 2, by: "Hla", title: "Note 2", rating: 3 },
-    { id: 3, by: "Mohammad", title: "Note 3", rating: 5 },
-    { id: 4, by: "Muath", title: "Note 4", rating: 6 },
-    { id: 5, by: "Ahmad", title: "Note 5", rating: 4 },
-    { id: 6, by: "Jusif", title: "Note 6", rating: 3 },
-    { id: 7, by: "Tariq", title: "Note 7", rating: 5 },
-    { id: 8, by: "Amer", title: "Note 8", rating: 6 },
+    { id: 1, by: "hadeel", course: "advance web technologies", title: "Topic 1: Status 33", rating: 4 },
+    { id: 2, by: "Hla", course_id: "advance web technologies", title: "Note 2", rating: 3 },
+    { id: 3, by: "Mohammad", course_id: "advance web technologies", title: "Note 3", rating: 5 },
+    { id: 4, by: "Muath", course_id: "advance web technologies", title: "Note 4", rating: 6 },
+    { id: 5, by: "Ahmad", course_id: "advance web technologies", title: "Note 5", rating: 4 },
+    { id: 6, by: "Jusif", course_id: "advance web technologies", title: "Note 6", rating: 3 },
+    { id: 7, by: "Tariq", course_id: "advance web technologies", title: "Note 7", rating: 5 },
+    { id: 8, by: "Amer", course_id: "advance web technologies", title: "Note 8", rating: 6 },
   ];
   const notes2 = [
-    { id: 9, by: "hadeel", title: "Topic 1: Status", rating: 4 },
-    { id: 10, by: "Hla", title: "Note 2", rating: 3 },
-    { id: 11, by: "Mohammad", title: "Note 3", rating: 5 },
-    { id: 12, by: "Muath", title: "Note 4", rating: 6 },
-    { id: 13, by: "Ahmad", title: "Note 5", rating: 4 },
-    { id: 14, by: "Jusif", title: "Note 6", rating: 3 },
-    { id: 15, by: "Tariq", title: "Note 7", rating: 5 },
-    { id: 16, by: "Amer", title: "Note 8", rating: 6 },
+    { id: 9, by: "hadeel", course_id: "Network System", title: "Topic 1: Status", rating: 4 },
+    { id: 10, by: "Hla", course_id: "Network System", title: "Note 2", rating: 3 },
+    { id: 11, by: "Mohammad", course_id: "Network System", title: "Note 3", rating: 5 },
+    { id: 12, by: "Muath", course_id: "Network System", title: "Note 4", rating: 6 },
+    { id: 13, by: "Ahmad", course_id: "Network System", title: "Note 5", rating: 4 },
+    { id: 14, by: "Jusif", course_id: "Network System", title: "Note 6", rating: 3 },
+    { id: 15, by: "Tariq", course_id: "Network System", title: "Note 7", rating: 5 },
+    { id: 16, by: "Amer", course_id: "Network System", title: "Note 8", rating: 6 },
   ];
 
 
@@ -53,18 +53,18 @@ export const NotesList = () => {
   
   const handleShowMoreClick = () => {
     setShowMore(true);
-    navigate("/notes/saved")
+    navigate("/notes/coursenotes")
 
   };
   const handleShowMoreClick2 = () => {
     setShowMore2(true);
-    navigate("/notes/saved")
+    navigate("/notes/coursenotes")
 
   };
 
 
   const visibleNotes = showMore  ? handleShowMoreClick : notes.slice(0, 4);
-  const visibleNotes2 = showMore2  ? handleShowMoreClick : notes.slice(0, 4);
+  const visibleNotes2 = showMore2  ? handleShowMoreClick : notes2.slice(0, 4);
 
 
   return (
@@ -166,7 +166,7 @@ export const NotesList = () => {
                         wordBreak: "break-word",
                         textOverflow:"ellipsis",
                         whiteSpace:"nowrap",
-
+                        overflow: "hidden",
                       }}
                       gutterBottom
                     >
