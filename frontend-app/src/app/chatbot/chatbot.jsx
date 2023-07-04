@@ -23,13 +23,14 @@ export const ChatBot = () => {
       setBotMessages((prevMessages) => [...prevMessages, botResponse]);
     };
 
-    if (userMessages.length > 0) {
+    if (userMessages.length > 1) {
       handleBotResponse();
     }
   }, [userMessages]);
 
   const handleUserMessageSend = (message) => {
-    setUserMessages((prevMessages) => [...prevMessages, message]);
+    setUserMessages((prevMessages) => [...prevMessages, message]); 
+    //map message ui every time the user sends a message
   };
   return (
     <Box
@@ -79,7 +80,7 @@ export const ChatBot = () => {
           </Grid>
         ))}
 
-        {botMessages.map((message, index) => (
+    {userMessages.length > 1 && botMessages.map((message, index) =>  (
           <Grid
             container
             spacing={2}
