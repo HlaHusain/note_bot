@@ -26,7 +26,7 @@ export const routes = [
     element: <CourseNotesList/>,
   },
   {
-    path: "/chatbot",
+    path: "/chatBot",
     element: <ChatBot/>,
   },
 ];
