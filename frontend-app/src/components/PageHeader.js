@@ -8,16 +8,10 @@ import { Typography, Button } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import Stack from '@mui/material/Stack';
 
-export const PageHeader = ({ label, actions = [] }) => {
-
-  const [title,setTitle] =React.useState(label)
-
-  const changeTitle =()=>{
-
-  }
+export const PageHeader = ({ label, actions = [] ,onChange }) => {
 
   const handleChange =(e)=>{
-    setTitle(e.target.value)
+    onChange(e.target.value)
   }
   return (
     <>
@@ -30,7 +24,7 @@ export const PageHeader = ({ label, actions = [] }) => {
         <Stack spacing={1} direction='row' alignItems='flex-end' >
 
           <TextField
-          value={title}
+          value={label}
           variant="standard"
           InputProps={{
             disableUnderline: true,

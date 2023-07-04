@@ -109,13 +109,12 @@ const getNotesByCourseTitle = async (req, res, next) => {
 
 // Create a new note
 const createNote = async (req, res, next) => {
-  const { user_id, title, isPublic, course_id } = req.body;
+  const { user_id, title, course_id  ,sections, widgets } = req.body;
 
-  console.log(user_id, title, isPublic, course_id);
 
   try {
     // Input validation
-    if (!user_id || !title || !course_id) {
+    if (!user_id || !title || !course_id || !sections|| !widgets) {
       return res.status(400).json({ message: "Missing required fields." });
     }
 
@@ -123,6 +122,8 @@ const createNote = async (req, res, next) => {
       userModel.findById(user_id),
       courseModel.findById(course_id),
     ]);
+
+    const sections_ids = sections.map((section) => section.id)
 
     // Check if user and course exist
     if (!user) {
@@ -137,12 +138,19 @@ const createNote = async (req, res, next) => {
     }
 
     try {
+      
       const sess = await mongoose.startSession();
       sess.startTransaction();
       const createdNote = new noteModel({
         title,
-        notes: noteIds,
+        course_id,
+        sections_ids
+        // notes: noteIds,
       });
+
+
+
+
       await createdNote.save({ session: sess }); //add the note to the database
       user.notes.push(createdNote); //push the note to the user
       await user.save({ session: sess }); //save the user

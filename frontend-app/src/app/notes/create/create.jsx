@@ -1,92 +1,215 @@
 import * as React from "react";
-import { Style } from "@mui/icons-material";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Unstable_Grid2";
-import { Button, Container } from "@mui/material";
+import { Button, Container, Stack } from "@mui/material";
 import { PageHeader } from "../../../components/PageHeader";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import SaveIcon from "@mui/icons-material/Save";
 import AddIcon from "@mui/icons-material/Add";
-import { LayoutItem } from "../../../components/Layouts/LayoutItem";
-import { Widget } from "../../../components/Layouts/Widget";
+import { useEffect } from "react";
+
 import { useState } from "react";
-import { TextEditor } from "../../../components/TextEditor";
-import { WidgetSelector } from "../../../components/Layouts/WidgetSelector";
+
+import { useAuth } from "../../../contexts/AuthProvider";
+import { AddCourseDialog } from "../../../components/AddCourseDialog";
+import { useToggle } from "../../../app/hooks/useToggle";
+import { Section } from "./Section";
+import { createNote, getCourses } from "./api";
 export const CreateNote = () => {
-  const [step, setStep] = React.useState("INITIAL");
-  const [widgets,setWidgets] = useState({})
+  /*
+    widgets structure
+    [sectionId]:
+      [layoutIndex]: widget
+  */
+  const [widgets, setWidgets] = useState({});
 
-  const [columns, setColumns] = React.useState([]);
+  const { token, user, saveUser, logout, isAuthorized } = useAuth();
 
-  const onLayoutSelect = (columns) => {
-    setColumns(columns);
-    setStep("WIDGET");
+  const [sections, setSections] = useState([]);
+  const [title, setTitle] = React.useState("");
+  const [course, setCourse] = useState("");
+  const [courses, setCourses] = useState(
+    [{ title: "AWT" , id :"32323" }]);
+
+  const onSectionChange = (id, data) => {
+    setSections((sections) =>
+      sections.map((section) => {
+        if (id !== section.id) {
+          return section;
+        }
+
+        return {
+          ...section,
+          ...data,
+        };
+      })
+    );
   };
-  const arrayWidget = {}
-  const onWidgetSelect =(type , index)=>{
+  const {
+    isActive: isAddCourseActive,
+    open: openAddCourse,
+    close: closeAddCourse,
+  } = useToggle();
 
-    setWidgets((widgets)=> ({
+  // const courses = [
+  // { name: "AWT" },
+  // { name: "ILE" },
+  // { name: "Interactive systems" },
+  // ];
+  const user_id = "649b6f816615c87ac498d9e9";
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const fetchedCourses = await getCourses(token, user_id);
+
+        const courses = fetchedCourses.courses.map((course)=>({
+          id:course._id,
+          ...course,
+        }))
+
+        setCourses(courses);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchCourses();
+  }, []);
+
+  const onWidgetSelect = (type, layoutIndex, sectionId) => {
+    setWidgets((widgets) => {
+      let section = widgets[sectionId];
+      if (!section) {
+        section = {};
+      }
+
+      return {
+        ...widgets,
+        [sectionId]: {
+          ...section,
+          [layoutIndex]: {
+            type,
+            data: {},
+          },
+        },
+      };
+    });
+  };
+
+  const onSubmit = async () => {
+    console.log(
+      "user == ",
+      user,
+      "sections = ",
+      sections,
+      " widgets = ",
+      widgets,
+      "title = ",
+      title,
+      "course",
+      course
+    );
+
+    // const res = await createNote(token, title , course, user, sections, widgets);
+  };
+
+  const onWidgetUpdate = (widgetData, layoutIndex, sectionId) => {
+    setWidgets((widgets) => ({
       ...widgets,
-      [index] : {type}
-    }) )
+      [sectionId]: {
+        ...widgets[sectionId],
+        [layoutIndex]: {
+          ...widgets[sectionId][layoutIndex],
+          ...widgetData,
+        },
+      },
+    }));
+  };
 
-  }
+  const hasWidgets = React.useMemo(
+    () => Object.keys(widgets).length > 0,
+    [widgets]
+  );
 
-  console.log('widgets' ,widgets )
-
-  const onTextEditorChange =()=>{
-
-  }
+  const hasCourse = !!course;
 
   return (
     <Container sx={{ flexGrow: 1, padding: 6 }}>
-      <PageHeader
-        title="New note title"
-        actions={[
-          {
-            label: "download as pdf",
-            startIcon: <FileDownloadIcon />,
-            onClick: () => {},
-            color: "primary",
-            variant: "outlined",
-            disabled: true,
-          },
-          {
-            label: "Save NOTE",
-            startIcon: <SaveIcon />,
-            onClick: () => {},
-            disableElevation: true,
-            disabled: true,
-          },
-        ]}
-      />
+      <Stack direction="column" spacing={8}>
+        <PageHeader
+          title="New note title"
+          onChange={(title) => setTitle(title)}
+          actions={[
+            {
+              label: "download as pdf",
+              startIcon: <FileDownloadIcon />,
+              onClick: () => {},
+              color: "primary",
+              variant: "outlined",
+              disabled: true,
+            },
+            {
+              label: "Save NOTE",
+              startIcon: <SaveIcon />,
+              onClick: () => {
+                onSubmit();
+              },
+              disableElevation: true,
+              disabled: !hasCourse || !hasWidgets,
+            },
+            {
+              label: "Add to course",
+              startIcon: <SaveIcon />,
+              onClick: openAddCourse,
+              disableElevation: true,
+              disabled: !hasWidgets,
+            },
+          ]}
+        />
 
-      {step === "INITIAL" && (
-        <Grid
-          item
-          xs={10}
-          md={10}
+        {sections.map((section, index) => (
+          <>
+            {index > 0 && <Box sx={{ height: 16, width: "100%" }} />}
+            <Section
+              key={section.id}
+              section={section}
+              onChange={onSectionChange}
+              onWidgetSelect={onWidgetSelect}
+              onWidgetUpdate={onWidgetUpdate}
+              widgets={widgets[section.id] || {}}
+            />
+          </>
+        ))}
+
+        <Stack
+          alignItems={"center"}
+          justifyContent={"center"}
           sx={{
-            padding: 5,
+            // marginTop: 2,
+            // padding: 5,
             height: 150,
             borderRadius: "5px",
             border: "1px dashed #000",
             background: "#FFF",
-            display: "flex",
-            justifyContent: "center",
-            alignContent: "center",
           }}
         >
           <Button
             color="primary"
-            onClick={() => setStep("LAYOUT")}
+            onClick={() =>
+              setSections((sections) => [
+                ...sections,
+                {
+                  layout: null,
+                  id: Math.random(),
+                },
+              ])
+            }
             variant="contained"
             sx={{
               borderRadius: "50%",
               width: 70,
               height: 70,
-              alignContent: "center",
-              justifyContent: "center",
               ":hover": {
                 background: "#ed955a",
                 color: "#FFFFFF",
@@ -95,88 +218,15 @@ export const CreateNote = () => {
           >
             <AddIcon />
           </Button>
-        </Grid>
-      )}
-
-      {step === "LAYOUT" && (
-        <Box padding={1}>
-          <Box
-            margin={1}
-            display={"flex"}
-            justifyContent={"center"}
-            alignContent={"center"}
-          >
-            CHOOSE LAYOUT
-          </Box>
-          <Grid container>
-            <LayoutItem columns={[12]} handle={onLayoutSelect}></LayoutItem>
-            <LayoutItem columns={[6, 6]} handle={onLayoutSelect}></LayoutItem>
-            <LayoutItem
-              columns={[4, 4, 4]}
-              handle={onLayoutSelect}
-            ></LayoutItem>
-            <LayoutItem
-              columns={[3, 3, 3, 3]}
-              handle={onLayoutSelect}
-            ></LayoutItem>
-            <LayoutItem columns={[4, 8]} handle={onLayoutSelect}></LayoutItem>
-            <LayoutItem columns={[8, 4]} handle={onLayoutSelect}></LayoutItem>
-          </Grid>
-          <Grid container>
-            <LayoutItem
-              columns={[3, 3, 6]}
-              handle={onLayoutSelect}
-            ></LayoutItem>
-            <LayoutItem
-              columns={[6, 3, 3]}
-              handle={onLayoutSelect}
-            ></LayoutItem>
-            <LayoutItem
-              columns={[3, 6, 3]}
-              handle={onLayoutSelect}
-            ></LayoutItem>
-            <LayoutItem
-              columns={[2.4, 2.4, 2.4, 2.4, 2.4]}
-              handle={onLayoutSelect}
-            ></LayoutItem>
-            <LayoutItem
-              columns={[2, 8, 2]}
-              handle={onLayoutSelect}
-            ></LayoutItem>
-            <LayoutItem
-              columns={[2, 2, 2, 2, 2, 2]}
-              handle={onLayoutSelect}
-            ></LayoutItem>
-          </Grid>
-        </Box>
-      )}
-
-      {step === "WIDGET" && (
-        <Grid container minHeight="100%" height="50vh" pt={2}>
-          {columns.map((column, index) => (
-            <Grid item xs={column}>
-              <WidgetSelector handle={onWidgetSelect} index={index} />
-
-            </Grid>
-          ))}
-        </Grid>
-      )}
-
-      {/* {step === 'NOTE' && (
-        <Grid container minHeight="100%" height="50vh" pt={2}>
-          {
-            columns.map((column,index) => (
-             <Grid item xs={column}>
-              {note === 'TEXT' && <Tiptap handle={onTextEditorChange} />}
-              {note === 'PDF' && <Widget handle={onWidgetClick} />}
-              {note === 'YOUTUBE' && <Widget handle={onWidgetClick} />}
-              </Grid>
-            ))
-          }
-
-
-        </Grid>
-      )} */}
+        </Stack>
+        <AddCourseDialog
+          onClose={closeAddCourse}
+          isOpen={isAddCourseActive}
+          courses={courses}
+          course={course}
+          onChange={(course) => setCourse(course)}
+        />
+      </Stack>
     </Container>
   );
 };
