@@ -3,7 +3,7 @@ import { NoteView } from "./view";
 import {CreateNote} from "./create"
 import {SavedNotesList} from './saved-list'
 import { CourseNotesList } from "./courseNotes";
-import { ChatBot } from "../chatbot/chatbot";
+import { ChatBot } from "../chatbot";
 export const routes = [
   {
     path: "/notes",
