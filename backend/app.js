@@ -41,10 +41,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(cors({credentials: true}));
-app.options("*", cors());
 
-
+app.use(cors({credentials:true}));
+app.options('*', cors());
 
 app.use((req, res, next) => {
   res.setHeader("Content-Security-Policy", "default-src 'self'");
