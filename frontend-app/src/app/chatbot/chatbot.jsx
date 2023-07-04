@@ -20,17 +20,18 @@ export const ChatBot = () => {
     const handleBotResponse = () => {
       // Handle the bot's response here
       const botResponse = "This is the bot's response.";
-      setBotMessages((prevMessages) => [...prevMessages, botResponse]);
+      setBotMessages((prevMessages) => [...prevMessages, botResponse]); 
+      //the useeffect will run again when userMessages changes
     };
 
-    if (userMessages.length > 1) {
+    if (userMessages.length > 0) {
       handleBotResponse();
     }
   }, [userMessages]);
 
   const handleUserMessageSend = (message) => {
-    setUserMessages((prevMessages) => [...prevMessages, message]); 
-    //map message ui every time the user sends a message
+    setUserMessages((prevMessages) => [...prevMessages, message]);
+     //every time the user sends a message, the userMessages array will be updated and map
   };
   return (
     <Box
@@ -80,7 +81,7 @@ export const ChatBot = () => {
           </Grid>
         ))}
 
-    {userMessages.length > 1 && botMessages.map((message, index) =>  (
+    {userMessages.length > 0 && botMessages.map((message, index) =>  (
           <Grid
             container
             spacing={2}
