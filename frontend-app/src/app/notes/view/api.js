@@ -1,19 +1,15 @@
-import {url} from '../../../config'
+import { url } from "../../../config";
 
-export const note =async (token,noteId)=>{
+export const getWidgets = async (token, noteId) => {
+  const response = await fetch(`${url}/notes/${noteId}/widgets`, {
+    method: "GET",
+    headers: {
+      "Content-type": "application/json",
+      Authorization: token,
+    },
+  });
 
-    const response = await fetch(`${url}/note/${noteId}` , {
-        method:"GET",
-        headers:{
-            "Content-type": "application/json",
-            Authorization: token,
-        },
+  const note = await response.json();
 
-    })
-
-    const note = await response.json()
-
-    return note
-
-
-}
+  return note;
+};

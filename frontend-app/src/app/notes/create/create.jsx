@@ -15,6 +15,7 @@ import { AddCourseDialog } from "../../../components/AddCourseDialog";
 import { useToggle } from "../../../app/hooks/useToggle";
 import { Section } from "./Section";
 import { createNote, getCourses } from "./api";
+import { useNavigate } from "react-router-dom";
 export const CreateNote = () => {
   /*
     widgets structure
@@ -28,7 +29,9 @@ export const CreateNote = () => {
   const [sections, setSections] = useState([]);
   const [title, setTitle] = React.useState("");
   const [course, setCourse] = useState("");
-  const [courses, setCourses] = useState([{ title: "AWT", id: "32323" }]);
+  const [courses, setCourses] = useState([]);
+
+  const navigate = useNavigate();
 
   const onSectionChange = (id, data) => {
     setSections((sections) =>
@@ -55,13 +58,13 @@ export const CreateNote = () => {
   // { name: "ILE" },
   // { name: "Interactive systems" },
   // ];
-  const user_id = "649b6f816615c87ac498d9e9";
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const fetchedCourses = await getCourses(token, user_id);
+        const fetchedCourses = await getCourses(token, user);
 
+        console.log("fetchedCourses", fetchedCourses);
         const courses = fetchedCourses.courses.map((course) => ({
           id: course._id,
           ...course,
@@ -97,20 +100,14 @@ export const CreateNote = () => {
   };
 
   const onSubmit = async () => {
-    console.log(
-      "user == ",
-      user,
-      "sections = ",
-      sections,
-      " widgets = ",
-      widgets,
-      "title = ",
-      title,
-      "course ==",
-      course
-    );
+    if (!title) {
+      alert("Title is empty");
+      return;
+    }
+    const res = await createNote(token, title, course, user, sections, widgets);
 
-    const res = await createNote(token, title , course, user, sections, widgets);
+    console.log("RES", res);
+    navigate(`/notes/${res.note._id}`);
   };
 
   const onWidgetUpdate = (widgetData, layoutIndex, sectionId) => {
@@ -137,7 +134,7 @@ export const CreateNote = () => {
     <Container sx={{ flexGrow: 1, padding: 6 }}>
       <PageHeader
         title={title}
-        label={'Add Note Title'}
+        label={"Add Note Title"}
         onChange={(title) => setTitle(title)}
         isEditable={true}
         actions={[
@@ -178,7 +175,7 @@ export const CreateNote = () => {
               onWidgetSelect={onWidgetSelect}
               onWidgetUpdate={onWidgetUpdate}
               widgets={widgets[section.id] || {}}
-              viewMode={true}
+              viewMode={false}
             />
           </>
         ))}
