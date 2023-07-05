@@ -26,6 +26,10 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref:'notes'
   }],
+  courses: [{
+    type: mongoose.Types.ObjectId,
+    ref:'courses'
+  }],
 });
 
 const userModel = mongoose.model(collectionName_users, userSchema);

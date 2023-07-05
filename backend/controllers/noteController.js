@@ -1,6 +1,8 @@
 const noteModel = require("../model/noteModel");
 const userModel = require("../model/userModel");
+const sectionModel = require("../model/sectionModel");
 const courseModel = require("../model/courseModel");
+const widgetModel = require("../model/widgetModel");
 const mongoose = require("mongoose");
 const HttpError = require("../model/http-error");
 //const { validationResult } = require('express-validator');
@@ -52,19 +54,21 @@ const getNoteByUserId = async (req, res, next) => {
     //res.json({ notes: user.notes.map(note => note.toObject({ getters: true })) });
     // Group notes by course ID
     const groupedNotes = {};
-    user.notes.forEach((note) => {
+
+    for (let note of user.notes) {
       const courseId = note.course_id._id.toString();
+      const course = await courseModel.findById(courseId);
 
       if (!groupedNotes[courseId]) {
         groupedNotes[courseId] = {
-          course_id: note.course_id._id,
-          course_title: note.course_id.title,
+          course_id: course._id,
+          course_title: course.title,
           notes: [],
         };
       }
 
       groupedNotes[courseId].notes.push(note);
-    });
+    }
 
     // Convert the grouped notes object to an array
     const groupedNotesArray = Object.values(groupedNotes);
@@ -109,13 +113,11 @@ const getNotesByCourseTitle = async (req, res, next) => {
 
 // Create a new note
 const createNote = async (req, res, next) => {
-  const { user_id, title, isPublic, course_id } = req.body;
-
-  console.log(user_id, title, isPublic, course_id);
+  const { user_id, title, isPublic, course_id, sections, widgets } = req.body;
 
   try {
     // Input validation
-    if (!user_id || !title || !course_id) {
+    if (!user_id || !title || !course_id || !sections || !widgets) {
       return res.status(400).json({ message: "Missing required fields." });
     }
 
@@ -137,21 +139,59 @@ const createNote = async (req, res, next) => {
     }
 
     try {
-      const sess = await mongoose.startSession();
-      sess.startTransaction();
+      const session = await mongoose.startSession();
+      session.startTransaction();
+
       const createdNote = new noteModel({
-        title,
-        notes: noteIds,
+        title: title,
+        isPublic: true,
+        avg_rate: 4,
+        course_id: course_id,
+        user_id: user_id,
       });
-      await createdNote.save({ session: sess }); //add the note to the database
-      user.notes.push(createdNote); //push the note to the user
-      await user.save({ session: sess }); //save the user
-      await sess.commitTransaction();
+      await createdNote.save({ session });
 
-      console.log("createdNote", createdNote);
+      for (const section of sections) {
+        console.log("SECTION", section);
 
-      res.status(201).json({ message: "Note created!", note: createdNote });
+        const sectionObject = new sectionModel({
+          layout_field: section.layout,
+          note_id: createdNote._id,
+        });
+        await sectionObject.save({ session });
+
+        if (widgets[section.id]) {
+          for (let widgetIndex in widgets[section.id]) {
+            const widget = widgets[section.id][widgetIndex];
+
+            const widgetObject = new widgetModel({
+              type: widget.type,
+              data: widget.data,
+              layout_index: parseInt(widgetIndex),
+              section_id: sectionObject._id,
+            });
+            await widgetObject.save({ session });
+          }
+        } 
+        // const widget = widgets[i];
+        // console.log("widgets[i]", i, widget);
+        // sess3.startTransaction();
+        // const createdWidgets = new widgetModel({
+        //   section_id: widget,
+        //   type: widget.type,
+        //   data: widget.data,
+        // });
+
+        // await createdWidgets.save({ session });
+      }
+
+      await session.commitTransaction();
+
+      res.status(201).json({
+        message: "Note , Sections , Widgets created successfully !",
+      });
     } catch (error) {
+      console.log(error);
       await session.abortTransaction();
       throw error;
     } finally {
@@ -186,12 +226,10 @@ const updateNote = async (req, res, next) => {
 
     note = await note.save();
 
-    res
-      .status(200)
-      .json({
-        message: "Note updated!",
-        note: note.toObject({ getters: true }),
-      });
+    res.status(200).json({
+      message: "Note updated!",
+      note: note.toObject({ getters: true }),
+    });
   } catch (err) {
     const error = new HttpError(
       "Updating note failed, please try again later.",

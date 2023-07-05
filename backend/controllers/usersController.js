@@ -1,4 +1,6 @@
 const User = require("../model/userModel");
+const File = require("../model/fileModel");
+
 const bcrypt = require("bcryptjs");
 //JSON Web Tokens (JWTs) are the most common way of implementing authentication in Single-Page-Applications.
 const jwt = require("jsonwebtoken");
@@ -31,7 +33,7 @@ const getUsers = async (req, res, next) => {
   let users;
   try {
     users = await User.find({}, "-password"); //exclude password :)
-    res.json({ users: users.map((user) => user.toObject({ getters: true }))});
+    res.json({ users: users.map((user) => user.toObject({ getters: true })) });
   } catch (err) {
     return res
       .status(500)
@@ -40,7 +42,7 @@ const getUsers = async (req, res, next) => {
 };
 
 const signup = async (req, res, next) => {
-  console.log('test test')
+  console.log("test test");
 
   const { user_name, email, password, study_field } = req.body;
 
@@ -53,7 +55,7 @@ const signup = async (req, res, next) => {
       .json({ message: "Signup failed , please try later" });
   }
 
-  if(existingUser && existingUser.email) {
+  if (existingUser && existingUser.email) {
     return res
       .status(422) //422 is for invalid input
       .json({ message: "User exists alreay , please login instead " });
@@ -68,7 +70,6 @@ const signup = async (req, res, next) => {
       .json({ message: "Could not create user , please try again" });
   }
 
-
   const createdUser = new User({
     user_name,
     email,
@@ -76,10 +77,8 @@ const signup = async (req, res, next) => {
     study_field,
   });
 
-
   try {
     await createdUser.save();
-
   } catch (err) {
     return res
       .status(500)
@@ -89,7 +88,6 @@ const signup = async (req, res, next) => {
   //create string token with userId , email with privatekey and experation time
   let token;
   try {
-
     token = jwt.sign(
       { userId: createdUser.id, email: createdUser.email },
       "dont share",
@@ -111,8 +109,7 @@ const login = async (req, res, next) => {
   let existingUser;
   try {
     existingUser = await User.findOne({ email: email });
-    console.log(existingUser , 'existingUser' , email, password)
-
+    console.log(existingUser, "existingUser", email, password);
   } catch (err) {
     return res
       .status(500)
@@ -129,11 +126,9 @@ const login = async (req, res, next) => {
   try {
     isVaildPassword = await bcrypt.compare(password, existingUser.password);
   } catch (err) {
-    return res
-      .status(500)
-      .json({
-        message: "Could not log you in  , Please check your credentials",
-      });
+    return res.status(500).json({
+      message: "Could not log you in  , Please check your credentials",
+    });
   }
 
   if (!isVaildPassword) {
@@ -141,7 +136,6 @@ const login = async (req, res, next) => {
       .status(401) //401 is for unauthorized
       .json({ message: "Invalid credentials  , Could not log you in " });
   }
-
 
   //create string token with userId , email with privatekey and experation time
   let token;
@@ -151,14 +145,13 @@ const login = async (req, res, next) => {
       "dont share",
       { expiresIn: "1h" }
     );
-    console.log('token' , token)
+    console.log("token", token);
   } catch (err) {
-    console.log('err' , err)
+    console.log("err", err);
     return res
       .status(500)
       .json({ message: "Logging in failed ! , please try again ... " });
   }
-
 
   res.json({
     userId: existingUser.id,
@@ -167,6 +160,35 @@ const login = async (req, res, next) => {
   });
 };
 
+const uploadFile = async (req, res, next) => {
+ 
+  try {
+     
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const file = new File({
+      filename: req.file.originalname,
+      url: `/uploads/${req.file.filename}`,
+      size: req.file.size,
+    });
+
+
+    console.log(req.file)
+
+
+
+    await file.save();
+
+    res.json({ message: "PDF file uploaded successfully", pdf: file });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 exports.login = login;
 exports.signup = signup;
 exports.getUsers = getUsers;
+exports.uploadFile = uploadFile;

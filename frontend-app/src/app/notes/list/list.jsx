@@ -24,34 +24,34 @@ import {
 import { PageHeader } from "../../../components/PageHeader";
 
 export const NotesList = () => {
-  const notes1 = [
-    { id: 1, title: "Topic 1: Status", rating: 4 },
-    { id: 2, title: "Note 2", rating: 3 },
-    { id: 3, title: "Note 3", rating: 5 },
-    { id: 4, title: "Note 4", rating: 6 },
-    { id: 5, title: "Note 5", rating: 4 },
-    { id: 6, title: "Note 6", rating: 3 },
-    { id: 7, title: "Note 7", rating: 5 },
-    { id: 8, title: "Note 8", rating: 6 },
-  ];
+  // const notes1 = [
+  //   { id: 1, title: "Topic 1: Status", rating: 4 },
+  //   { id: 2, title: "Note 2", rating: 3 },
+  //   { id: 3, title: "Note 3", rating: 5 },
+  //   { id: 4, title: "Note 4", rating: 6 },
+  //   { id: 5, title: "Note 5", rating: 4 },
+  //   { id: 6, title: "Note 6", rating: 3 },
+  //   { id: 7, title: "Note 7", rating: 5 },
+  //   { id: 8, title: "Note 8", rating: 6 },
+  // ];
 
-  const notes2 = [
-    { id: 9, title: "Topic 1 in ILE", rating: 4 },
-    { id: 10, title: "Notes in AI Ethics", rating: 3 },
-    { id: 11, title: "Notes in CTAT", rating: 5 },
-    { id: 12, title: "Notes in FIAT", rating: 6 },
-    { id: 13, title: "Note 5", rating: 4 },
-    { id: 14, title: "Note 6", rating: 3 },
-    { id: 15, title: "Note 7", rating: 5 },
-    { id: 16, title: "Note 8", rating: 6 },
-  ];
+  // const notes2 = [
+  //   { id: 9, title: "Topic 1 in ILE", rating: 4 },
+  //   { id: 10, title: "Notes in AI Ethics", rating: 3 },
+  //   { id: 11, title: "Notes in CTAT", rating: 5 },
+  //   { id: 12, title: "Notes in FIAT", rating: 6 },
+  //   { id: 13, title: "Note 5", rating: 4 },
+  //   { id: 14, title: "Note 6", rating: 3 },
+  //   { id: 15, title: "Note 7", rating: 5 },
+  //   { id: 16, title: "Note 8", rating: 6 },
+  // ];
   const [showMore, setShowMore] = React.useState(false);
   const handleShowMoreClick = () => {
     setShowMore(true);
   };
 
-  const visibleNotes1 = showMore ? notes1 : notes1.slice(0, 4);
-  const visibleNotes2 = showMore ? notes2 : notes2.slice(0, 4);
+  // const visibleNotes1 = showMore ? notes1 : notes1.slice(0, 4);
+  // const visibleNotes2 = showMore ? notes2 : notes2.slice(0, 4);
 
   const [notes, setNotes] = useState([]);
   const { token, user, saveUser, logout, isAuthorized } = useAuth();
@@ -62,6 +62,7 @@ export const NotesList = () => {
     let notesList = async () => {
       const notes = await getNotes(token, user);
       setNotes(notes);
+      console.log('notes ===' , notes)
     };
     notesList();
   }, []);
@@ -71,6 +72,7 @@ export const NotesList = () => {
 
       <PageHeader
         title="My Notes"
+        isEditable={false}
         actions={[
           {
             label: "Add Note",
@@ -92,6 +94,8 @@ export const NotesList = () => {
       
 
       <Grid container spacing={2} justifyContent="center">
+      {notes &&
+              notes.map((note) => (
         <Grid item sx={{ maxWidth: 1400, width: "100%" }}>
           <Grid container sx={{ px: 2 }}>
             <Typography
@@ -99,12 +103,13 @@ export const NotesList = () => {
               sx={{ color: "#ED7D31", marginBottom: 0 }}
               gutterBottom
             >
-              Advance web Technologies
+              {note.course_title}
             </Typography>
           </Grid>
           <Grid container spacing={2} sx={{ p: 2 }}>
-            {notes &&
-              notes.map((note) => (
+
+          {note &&
+              note.notes.map((note) => (
                 <Grid item={true} xs={12} sm={6} md={4} key={note.id}>
                   <Card sx={{ bgcolor: "#E8E8E8", borderRadius: 2 }}>
                     <CardHeader
@@ -152,7 +157,7 @@ export const NotesList = () => {
                     </CardActions>
                   </Card>
                 </Grid>
-              ))}
+           ))}
             {!showMore && (
               <Grid item xs={12} sm={6} md={4} display={"flex"}>
                 <Button
@@ -177,8 +182,8 @@ export const NotesList = () => {
             }}
           />
         </Grid>
-
-        <Grid item sx={{ maxWidth: 1400, width: "100%" }}>
+              ))}
+        {/* <Grid item sx={{ maxWidth: 1400, width: "100%" }}>
           <Grid container sx={{ px: 2 }}>
             <Typography
               variant="h6"
@@ -252,7 +257,9 @@ export const NotesList = () => {
               </Grid>
             )}
           </Grid>
-        </Grid>
+        </Grid> */}
+
+
       </Grid>
     </Container>
   );

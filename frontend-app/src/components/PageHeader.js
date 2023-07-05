@@ -8,16 +8,10 @@ import { Typography, Button } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import Stack from '@mui/material/Stack';
 
-export const PageHeader = ({ label, actions = [] }) => {
-
-  const [title,setTitle] =React.useState(label)
-
-  const changeTitle =()=>{
-
-  }
+export const PageHeader = ({ title,isEditable, actions = [] ,onChange , label}) => {
 
   const handleChange =(e)=>{
-    setTitle(e.target.value)
+    onChange(e.target.value)
   }
   return (
     <>
@@ -25,7 +19,7 @@ export const PageHeader = ({ label, actions = [] }) => {
         container
         alignItems="center"
         justifyContent="space-between"
-        sx={{ marginBottom: 2 }}
+
       >
         <Stack spacing={1} direction='row' alignItems='flex-end' >
 
@@ -35,11 +29,14 @@ export const PageHeader = ({ label, actions = [] }) => {
           InputProps={{
             disableUnderline: true,
           }}
+          disabled={!isEditable}
           onChange={handleChange}
-          label="New note title"
+          label={label}
 
           />
-            <EditIcon />
+          {!!isEditable &&
+                      <EditIcon />
+          } 
         </Stack>
         <Stack spacing={1} direction='row' >
           {actions.map(({label,...action}) => (
@@ -58,6 +55,7 @@ export const PageHeader = ({ label, actions = [] }) => {
       <Divider
         component="div"
         role="presentation"
+        sx={{marginY:2}}
       />
     </>
   );

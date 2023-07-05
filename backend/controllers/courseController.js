@@ -1,200 +1,143 @@
-const courseModel = require('../model/courseModel');
-const noteModel = require('../model/noteModel');
-const userModel = require('../model/userModel');
-const HttpError = require('../model/http-error');
-const mongoose = require('mongoose');
+const courseModel = require("../model/courseModel");
+const noteModel = require("../model/noteModel");
+const userModel = require("../model/userModel");
+const HttpError = require("../model/http-error");
+const mongoose = require("mongoose");
+const { json } = require("body-parser");
 
-
-//Get notes' courses by user_id 
-const getCoursesByUserId = async (req, res, next) => {
-    const { user_id } = req.params;
-  
-    try {
-      //Populate to Replace the user id in a document with the data of that user, nested Population
-      const user = await userModel.findById(user_id).populate({
-        path: 'notes',
-        populate: { path: 'course_id' } // Populate the course reference for each note
-      });
-  
-      if (!user) {
-        return res.status(404).json({ message: "Could not find user for the provided id." });
-      }
-     
-    // Calculate the number of notes for each course
-    const courses = {};
-    user.notes.forEach((note) => {
-      const courseTitle = note.course_id.title;
-
-      if (!courses[courseTitle]) {
-        courses[courseTitle] = {
-          title: courseTitle,
-          numOfNotes: 0
-        };
-      }
-
-      courses[courseTitle].numOfNotes++;
+//get all courses : test
+const getAllCourses = async (req, res, next) => {
+  try {
+    const courses = await courseModel.find();
+    res.json({
+      courses: courses.map((course) => course.toObject({ getters: true })),
     });
+  } catch (err) {
+    const error = new HttpError(
+      "Fetching courses failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+};
 
-    // Convert the courses object to an array of courses
-    const coursesArray = Object.values(courses);
+//Get courses by user_id
+const getCoursesByUserId = async (req, res, next) =>{
+  const { user_id } = req.params;
 
-    res.json({ courses: coursesArray });
+  try {
+    const user = await userModel.findById(user_id).populate("courses");
 
-    } catch (err) {
-      const error = new HttpError('An error occurred while fetching notes.', 500);
-      return next(error);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: "Could not find user for the provided user id." });
     }
-  };
+
+    res.json({
+      courses: user.courses.map((course) => course.toObject({ getters: true })),
+    });
+  } catch (err) {
+    const error = new HttpError(
+      "An error occurred while fetching courses.",
+      500
+    );
+    return next(error);
+  }
+};
+
+//Create a new course
+const createCourse = async (req, res, next) => {
+  const { user_id, title } = req.body;
+  let session; // Declare the session variable
+
+  try {
+    // Start a Mongoose session
+    session = await mongoose.startSession();
+    session.startTransaction();
+
+    // Create the course
+    const createdCourse = await courseModel.create([{ user_id, title }], { session });
+
+    // Assign the course to the user
+    await userModel.findByIdAndUpdate(
+      user_id,
+      { $push: { courses: createdCourse[0]._id } },
+      { session }
+    );
+
+    // Commit the transaction
+    await session.commitTransaction();
+
+    res.status(201).json({ course: createdCourse[0] });
+  } catch (error) {
+    // Abort the transaction and roll back changes
+    if (session) {
+      await session.abortTransaction();
+    }
+
+    const httpError = new HttpError(
+      `An error occurred while creating the course: ${error.message}`,
+      500
+    );
+    return next(httpError);
+  } finally {
+    // End the session
+    if (session) {
+      session.endSession();
+    }
+  }
+};
+
+//delete course and its notes
+const deleteCourseWithNotes = async (req, res, next) => {
+  const { course_id } = req.params;
   
+  try {
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-    //create a new course with empty notes
-    const createCourseWithEmptyNotes = async (req, res, next) => {
-        const { title } = req.body;
-      
-        try {
-          // Input validation
-          if (!title) {
-            return res.status(400).json({ message: "Invalid course data." });
-          }
-      
-          const session = await mongoose.startSession();
-          session.startTransaction();
-      
-          try {
-            const createdCourse = new courseModel({
-              title,
-              notes: [] // Empty notes array
-            });
-      
-            await createdCourse.save({ session });
-      
-            await session.commitTransaction();
-      
-            res.status(201).json({ message: "Course created!", course: createdCourse });
-          } catch (error) {
-            await session.abortTransaction();
-            throw error;
-          } finally {
-            session.endSession();
-          }
-        } catch (err) {
-          const error = new HttpError('Creating course failed, please try again later.', 500);
-          return next(error);
-        }
-      };
-      
+    try {
+      const course = await courseModel.findById(course_id);
 
-    //create a new course for existing notes
-      const createCourseWithNotes = async (req, res, next) => {
-        const { title, noteIds } = req.body;
-      
-        try {
-          // Input validation
-          if (!title || !Array.isArray(noteIds)) {
-            return res.status(400).json({ message: "Invalid course data." });
-          }
-      
-          const session = await mongoose.startSession();
-          session.startTransaction();
-      
-          try {
-            const createdCourse = new courseModel({
-              title,
-              notes: noteIds // Assign the array of note IDs to the notes field
-            });
-      
-            await createdCourse.save({ session });
-      
-            // Associate the course with the existing notes
-            await noteModel.updateMany(
-              { _id: { $in: noteIds } },
-              { $set: { course_id: createdCourse._id } },
-              { session }
-            );
-      
-            await session.commitTransaction();
-      
-            res.status(201).json({ message: "Course created!", course: createdCourse });
-          } catch (error) {
-            await session.abortTransaction();
-            throw error;
-          } finally {
-            session.endSession();
-          }
-        } catch (err) {
-          const error = new HttpError('Creating course failed, please try again later.', 500);
-          return next(error);
-        }
-      };
-      
+      if (!course) {
+        return res
+          .status(404)
+          .json({ message: "Could not find course for the provided id." });
+      }
 
-    //update a course
-    const updateCourse = async (req, res, next) => {
-        const { course_id } = req.params;
-        const { title } = req.body;
-      
-        try {
-          const course = await courseModel.findById(course_id);
-      
-          if (!course) {
-            return res.status(404).json({ message: "Could not find course for the provided id." });
-          }
-      
-          course.title = title; // Update the course title
-      
-          await course.save();
-      
-          res.status(200).json({ message: "Course updated!", course });
-        } catch (err) {
-          console.error(err);
-          res.status(500).json({ message: "An error occurred." });
-        }
-      };
+      const noteIds = course.notes;
 
-      
+      // Delete the course and its associated notes
+      await Promise.all([
+        courseModel.findByIdAndDelete(course_id, { session }), // Delete the course
+        noteModel.deleteMany({ _id: { $in: noteIds } }, { session }), // Delete the associated notes
+      ]);
 
-    //delete course and its notes
-    const deleteCourseWithNotes = async (req, res, next) => {
-        const { course_id } = req.params;
-      
-        try {
-          const session = await mongoose.startSession();
-          session.startTransaction();
-      
-          try {
-            const course = await courseModel.findById(course_id);
-      
-            if (!course) {
-              return res.status(404).json({ message: "Could not find course for the provided id." });
-            }
-      
-            const noteIds = course.notes;
-      
-            // Delete the course and its associated notes
-            await Promise.all([
-              courseModel.findByIdAndDelete(course_id, { session }), // Delete the course
-              noteModel.deleteMany({ _id: { $in: noteIds } }, { session }) // Delete the associated notes
-            ]);
-      
-            await session.commitTransaction();
-      
-            res.status(200).json({ message: "Course and associated notes deleted." });
-          } catch (error) {
-            await session.abortTransaction();
-            throw error;
-          } finally {
-            session.endSession();
-          }
-        } catch (err) {
-          const error = new HttpError('Deleting course failed, please try again later.', 500);
-          return next(error);
-        }
-      };
+      await session.commitTransaction();
 
-      
+      res.status(200).json({ message: "Course and associated notes deleted." });
+    } catch (error) {
+      await session.abortTransaction();
+      const httpError = new HttpError(
+        `An error occurred while deleting the course: ${error.message}`,
+        500
+      );
+      return next(httpError);
+    } finally {
+      session.endSession();
+    }
+  } catch (err) {
+    const error = new HttpError(
+      "Deleting course failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+};
 
-    exports.getCoursesByUserId = getCoursesByUserId;
-    exports.createCourseWithEmptyNotes = createCourseWithEmptyNotes;
-    exports.createCourseWithNotes = createCourseWithNotes;
-    exports.updateCourse = updateCourse;
-    exports.deleteCourseWithNotes = deleteCourseWithNotes;
+
+exports.getAllCourses = getAllCourses;
+exports.getCoursesByUserId = getCoursesByUserId;
+exports.deleteCourseWithNotes = deleteCourseWithNotes;
+exports.createCourse = createCourse;

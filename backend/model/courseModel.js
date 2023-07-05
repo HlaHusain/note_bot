@@ -13,6 +13,11 @@ const courseSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref:'notes'
   }],
+  user_id: {
+    type: mongoose.Types.ObjectId,
+    required: true,
+    ref:'users'
+  },
 
 });
 

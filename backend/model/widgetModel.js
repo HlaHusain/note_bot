@@ -1,26 +1,26 @@
 const mongoose = require("./dbconnection.js");
 const WIDGET_TYPES = require("./widgetTypes");
 // Initialize parameters
-const collectionName_widgets = 'widgets';
-
-
+const collectionName_widgets = "widgets";
 
 //define structure of the documents in a collection
 const widgetSchema = new mongoose.Schema({
   type: {
     type: String,
-    enum: [WIDGET_TYPES.TEXT, WIDGET_TYPES.VIDEO, WIDGET_TYPES.PDF],
-    default: 1,
     required: true,
   },
   data: {
     type: Object,
     required: true,
   },
+  layout_index: {
+    type: Number,
+    required: true,
+  },
   section_id: {
     type: mongoose.Types.ObjectId,
     required: true,
-    ref: 'sections',
+    ref: "sections",
   },
 });
 
