@@ -6,40 +6,36 @@ import AddIcon from "@mui/icons-material/Add";
 import { Divider, TextField } from "@mui/material";
 import { Typography, Button } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import Stack from '@mui/material/Stack';
+import Stack from "@mui/material/Stack";
 
-export const PageHeader = ({ title,isEditable, actions = [] ,onChange , label}) => {
-
-  const handleChange =(e)=>{
-    onChange(e.target.value)
-  }
+export const PageHeader = ({
+  title,
+  isEditable,
+  actions = [],
+  onChange,
+  label,
+}) => {
+  const handleChange = (e) => {
+    onChange(e.target.value);
+  };
   return (
     <>
-      <Grid
-        container
-        alignItems="center"
-        justifyContent="space-between"
-
-      >
-        <Stack spacing={1} direction='row' alignItems='flex-end' >
-
+      <Grid container alignItems="center" justifyContent="space-between">
+        <Stack spacing={1} direction="row" alignItems="flex-end">
           <TextField
-          value={title}
-          variant="standard"
-          InputProps={{
-            disableUnderline: true,
-          }}
-          disabled={!isEditable}
-          onChange={handleChange}
-          label={label}
-
+            value={title}
+            variant="standard"
+            InputProps={{
+              disableUnderline: true,
+            }}
+            disabled={!isEditable}
+            onChange={handleChange}
+            label={label}
           />
-          {!!isEditable &&
-                      <EditIcon />
-          } 
+          {!!isEditable && <EditIcon />}
         </Stack>
-        <Stack spacing={1} direction='row' >
-          {actions.map(({label,...action}) => (
+        <Stack spacing={1} direction="row">
+          {actions.map(({ label, ...action }) => (
             <Button
               color="primary"
               startIcon={<AddIcon />}
@@ -52,11 +48,7 @@ export const PageHeader = ({ title,isEditable, actions = [] ,onChange , label}) 
           ))}
         </Stack>
       </Grid>
-      <Divider
-        component="div"
-        role="presentation"
-        sx={{marginY:2}}
-      />
+      <Divider component="div" role="presentation" sx={{ marginY: 2 }} />
     </>
   );
 };

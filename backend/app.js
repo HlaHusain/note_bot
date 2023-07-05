@@ -4,14 +4,14 @@ var cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
 var logger = require("morgan");
 const HttpError = require("./model/http-error");
-var cors = require('cors')
+var cors = require("cors");
 
 require("dotenv").config();
 
 //import the routes
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
-var fillRouter = require("./routes/fillDB");
+// var fillRouter = require("./routes/fillDB");
 var notesRouter = require("./routes/notes");
 var coursesRouter = require("./routes/courses");
 var sectionsRouter = require("./routes/sections");
@@ -41,9 +41,8 @@ app.use((req, res, next) => {
   next();
 });
 
-
-app.use(cors({credentials:true}));
-app.options('*', cors());
+app.use(cors({ credentials: true }));
+app.options("*", cors());
 
 app.use((req, res, next) => {
   res.setHeader("Content-Security-Policy", "default-src 'self'");
@@ -53,9 +52,10 @@ app.use((req, res, next) => {
 app.use(bodyParser.json()); // support json encoded bodies
 
 //midellware , initial route filter of paths: ex, '/users','/notes'..
-app.use("/", indexRouter);
 app.use("/users", usersRouter);
-app.use("/fill", fillRouter);
+app.use(require("./middleware/check-auth"));
+app.use("/", indexRouter);
+// app.use("/fill", fillRouter);
 app.use("/notes", notesRouter);
 app.use("/courses", coursesRouter);
 app.use("/sections", sectionsRouter);

@@ -8,11 +8,11 @@ export const routes = [
     element: <NotesList />,
   },
   {
-    path: "/note/:id",
+    path: "/notes/:id",
     element: <NoteView />,
   },
   {
-    path: "/note",
+    path: "/notes/create",
     element: <CreateNote />,
   },
   {
