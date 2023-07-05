@@ -1,38 +1,34 @@
-const { Configuration, OpenAIApi, RateLimitError} = require("openai");
+const { Configuration, OpenAIApi} = require("openai");
 //const backoff = require('backoff');
 // const HttpError = require("../model/http-error");
 
-const openAIConfig = new Configuration({
+const openAIConfig = new Configuration(params ={
     organization: "org-65qL0uV70AbvbEVHEZcr9iD8",
-    apiKey: "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",
+    apiKey: "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",
 });
 
 const openapi = new OpenAIApi(openAIConfig);
 
-const chatCompletion = async (req, res, next) => {
+const chatCompletion = async (req, res) => {
     try {
-        const prompt = req.body.prompt;
+        const { prompt } = req.body;
     
         const response = await openapi.createCompletion({
-          model: "text-davinci-003",
-          prompt: `${prompt}`,
-          temperature: 0, // Higher values means the model will take more risks.
-          max_tokens: 3000, // The maximum number of tokens to generate in the completion. Most models have a context length of 2048 tokens (except for the newest models, which support 4096).
-          top_p: 1, // alternative to sampling with temperature, called nucleus sampling
-          frequency_penalty: 0.5, // Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.
-          presence_penalty: 0, // Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.
+          model: 'gpt-3.5-turbo',
+          messages: [
+            { role: 'bot', content: 'Hello, I am a chatbot. I am very smart.' },
+            { role: 'user', content: prompt },
+          ],
         });
     
-        res.status(200).send({
-          bot: response.data.choices[0].text
-        });
-    
+        const botResponse = response.data.choices[0].message.content;
+        res.status(200).json({ bot: botResponse });
       } catch (error) {
-        console.error(error)
-        res.status(500).send(error || 'Something went wrong');
+        console.error(error);
+        res.status(500).json({ error: 'Something went wrong' });
       }
     };
-    
+
 // const chatCompletion = async (req, res) => {
 //     try {
 //       const { prompt } = req.body;

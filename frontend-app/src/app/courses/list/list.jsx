@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { CreateCourse } from "../create/create";
+import AddIcon from "@mui/icons-material/Add";
 import {
   Table,
   TableBody,
@@ -14,18 +13,20 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import { PHeader } from "../../../components/PHeader";
 import { MenuComponent } from "../../../components/Menu";
-import {
-  getCourses,
-  getCoursesByUserId
-} from "./api";
+import { CreateCourseDialog } from "../create/create";
+import { getCourses, getCoursesByUserId } from "./api";
+import { deleteCourseWithNotes } from "./course.api";
 
 //import { getAllCourses, getCoursesByUserId, createCourse, deleteCourseWithNotes } from "./course.api";
 
 export const CoursesList = () => {
   const [courses, setCourses] = useState([]);
+  const [open, setOpen] = useState(false);
+
+
   // const { user_id } = useParams();
   // console.log(user_id);
-  
+
   const user_id = "649b6f816615c87ac498d9e9";
 
   useEffect(() => {
@@ -55,46 +56,52 @@ export const CoursesList = () => {
   //   fetchCourses();
   // }, []);
 
-  // State to manage the visibility of the CreateCourse component
-  const [showCreateCourse, setShowCreateCourse] = useState(false);
+  const handleOpen = () => {
+    setOpen(true);
+  };
 
-  const handleAddCourse = async (user_id, title) => {
-    // try {
-    //   const newCourse = await createCourse(user_id, title);
-    //   // Handle the response or update the courses list as needed
-    //   console.log("New course added:", newCourse);
-    //   // Hide the CreateCourse component after adding a new course
-    //   setShowCreateCourse(false);
-    // } catch (error) {
-    //   console.error(error);
-    // }
+  const handleClose = () => {
+    setOpen(false);
   };
-  const handleDeleteCourse = async (courseId) => {
-    // try {
-    //   await deleteCourseWithNotes(courseId);
-    //   setCourses((prevCourses) =>
-    //     prevCourses.filter((course) => course.id !== courseId)
-    //   );
-    // } catch (error) {
-    //   console.error(error);
-    // }
-  };
+
+// Handle course deletion
+const handleDeleteCourse = async (courseId) => {
+  try {
+    await deleteCourseWithNotes(courseId);
+    setCourses((prevCourses) =>
+      prevCourses.filter((course) => course.id !== courseId)
+    );
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 
   return (
     <div>
       <MenuComponent />
       <PHeader
-        title="My Courses"
-        actions={[
-          {
-            label: "Add Course",
-            onClick: () => {
-              // Updated the code to use the correct syntax
-              return <CreateCourse handleAddCourse={handleAddCourse} />;
-            },
-          },
-        ]}
+      title="My Courses"
+      actions={[
+        {
+          label: "Add Course",
+          startIcon: <AddIcon />,
+          color: "primary",
+          onClick: handleOpen,
+          disableElevation: true,
+        },
+      ]}
+    />
+    {open && (
+      <CreateCourseDialog
+        isOpen={open}
+        onClose={handleClose}
+        courses={courses}
+        user_id={user_id}
+        setCourses={setCourses}
       />
+    )}
+      
       <TableContainer
         component={Paper}
         sx={{
@@ -147,7 +154,7 @@ export const CoursesList = () => {
                   sx={{
                     fontSize: "22px",
                     fontFamily: "Poppins",
-                    color: "#F76D16",
+                    color: "#ED7D31",
                     textAlign: "center",
                     verticalAlign: "middle",
                   }}
@@ -158,7 +165,7 @@ export const CoursesList = () => {
                   sx={{
                     fontSize: "22px",
                     fontFamily: "Poppins",
-                    color: "#F76D16",
+                    color: "#ED7D31",
                     textAlign: "center",
                     verticalAlign: "middle",
                   }}
@@ -169,7 +176,7 @@ export const CoursesList = () => {
                   sx={{ textAlign: "center", verticalAlign: "middle" }}
                 >
                   <IconButton onClick={() => handleDeleteCourse(course.id)}>
-                    <DeleteIcon style={{ color: "#F76D16" }} />
+                    <DeleteIcon style={{ color: "#ED7D31" }} />
                   </IconButton>
                 </TableCell>
               </TableRow>

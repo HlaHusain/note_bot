@@ -1,4 +1,4 @@
-import { CreateCourse } from "./create";
+import { CreateCourseDialog } from "./create";
 import { CoursesList } from "./list";
 import { SearchByCourse } from "./search";
 
@@ -10,10 +10,10 @@ export const routes = [
   },
   {
     path: "/create-course",
-    element: <CreateCourse />,
+    element: <CreateCourseDialog />,
   },
   {
-    path: "/course/:keyword",
+    path: "/search/:keyword",
     element: <SearchByCourse />,
   }
 ];

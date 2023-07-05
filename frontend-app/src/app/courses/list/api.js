@@ -30,16 +30,24 @@ export const getCoursesByUserId = async (user_id) => {
   }
 };
 
-// export const createCourse = async (user_id,courseTitle) => {
-//   try {
-//     const response = await axiosClient.post("/courses", { user_id: user_id ,title: courseTitle });
-//     return response.data.course;
-//   } catch (error) {
-//     throw new Error("Failed to add the new course.");
-//   }
-// };
+export const createCourse = async (user_id, title) => {
+  try {
+    const response = await axiosClient.post(`/courses`, {
+      user_id,
+      title,
+    });
+    console.log(response); // Log the response for debugging
 
-
+    if (response.status === 200) {
+      return response.data.course;
+    } else {
+      throw new Error(response.data.message || 'Failed to create a new course.');
+    }
+  } catch (error) {
+    console.log(error);
+    throw new Error('Failed to create a new course.');
+  }
+};
 // export const deleteCourseWithNotes = async (courseId) => {
 //   console.log('courseId = ',courseId);
 //   try {
@@ -51,3 +59,14 @@ export const getCoursesByUserId = async (user_id) => {
 // };
 
 
+export const deleteCourseWithNotes = async (course_id) => {
+  try {
+    const response = await axiosClient.delete(`/courses/${course_id}`);
+    if (response.status !== 204) {
+      throw new Error('Failed to delete the course.');
+    }
+    return true;
+  } catch (error) {
+    throw new Error('Failed to delete the course.');
+  }
+};

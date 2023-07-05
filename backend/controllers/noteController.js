@@ -219,7 +219,6 @@ const pushSectionsToNote = async (req, res, next) => {
 };
 
 
-
 //update note
 const updateNote = async (req, res, next) => {
   const { title, isPublic, course_id } = req.body;
