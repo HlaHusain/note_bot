@@ -27,7 +27,7 @@ export const ChatBot = () => {
     if (userMessages.length > 0) {
       handleBotResponse();
     }
-  }, [userMessages]);
+  }, []);
 
   const handleUserMessageSend = (message) => {
     setUserMessages((prevMessages) => [...prevMessages, message]);
