@@ -43,7 +43,7 @@ export const MenuComponent = () => {
     <>
       <AppBar
         position="static"
-        sx={{ background: "#fff", textTransform: "uppercase" }}
+        sx={{ background: "#fff", textTransform: "uppercase" ,marginBottom:3 }}
       >
         <Container maxWidth="l" >
           <Toolbar disableGutters >
