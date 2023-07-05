@@ -28,8 +28,7 @@ export const CreateNote = () => {
   const [sections, setSections] = useState([]);
   const [title, setTitle] = React.useState("");
   const [course, setCourse] = useState("");
-  const [courses, setCourses] = useState(
-    [{ title: "AWT" , id :"32323" }]);
+  const [courses, setCourses] = useState([{ title: "AWT", id: "32323" }]);
 
   const onSectionChange = (id, data) => {
     setSections((sections) =>
@@ -63,10 +62,10 @@ export const CreateNote = () => {
       try {
         const fetchedCourses = await getCourses(token, user_id);
 
-        const courses = fetchedCourses.courses.map((course)=>({
-          id:course._id,
+        const courses = fetchedCourses.courses.map((course) => ({
+          id: course._id,
           ...course,
-        }))
+        }));
 
         setCourses(courses);
       } catch (error) {
@@ -107,11 +106,11 @@ export const CreateNote = () => {
       widgets,
       "title = ",
       title,
-      "course",
+      "course ==",
       course
     );
 
-    // const res = await createNote(token, title , course, user, sections, widgets);
+    const res = await createNote(token, title , course, user, sections, widgets);
   };
 
   const onWidgetUpdate = (widgetData, layoutIndex, sectionId) => {
@@ -136,38 +135,39 @@ export const CreateNote = () => {
 
   return (
     <Container sx={{ flexGrow: 1, padding: 6 }}>
-      <Stack direction="column" spacing={8}>
-        <PageHeader
-          title="New note title"
-          onChange={(title) => setTitle(title)}
-          actions={[
-            {
-              label: "download as pdf",
-              startIcon: <FileDownloadIcon />,
-              onClick: () => {},
-              color: "primary",
-              variant: "outlined",
-              disabled: true,
+      <PageHeader
+        title={title}
+        label={'Add Note Title'}
+        onChange={(title) => setTitle(title)}
+        isEditable={true}
+        actions={[
+          {
+            label: "download as pdf",
+            startIcon: <FileDownloadIcon />,
+            onClick: () => {},
+            color: "primary",
+            variant: "outlined",
+            disabled: true,
+          },
+          {
+            label: "Save NOTE",
+            startIcon: <SaveIcon />,
+            onClick: () => {
+              onSubmit();
             },
-            {
-              label: "Save NOTE",
-              startIcon: <SaveIcon />,
-              onClick: () => {
-                onSubmit();
-              },
-              disableElevation: true,
-              disabled: !hasCourse || !hasWidgets,
-            },
-            {
-              label: "Add to course",
-              startIcon: <SaveIcon />,
-              onClick: openAddCourse,
-              disableElevation: true,
-              disabled: !hasWidgets,
-            },
-          ]}
-        />
-
+            disableElevation: true,
+            disabled: !hasCourse || !hasWidgets,
+          },
+          {
+            label: "Add to course",
+            startIcon: <SaveIcon />,
+            onClick: openAddCourse,
+            disableElevation: true,
+            disabled: !hasWidgets,
+          },
+        ]}
+      />
+      <Stack direction="column" spacing={6}>
         {sections.map((section, index) => (
           <>
             {index > 0 && <Box sx={{ height: 16, width: "100%" }} />}
@@ -178,6 +178,7 @@ export const CreateNote = () => {
               onWidgetSelect={onWidgetSelect}
               onWidgetUpdate={onWidgetUpdate}
               widgets={widgets[section.id] || {}}
+              viewMode={true}
             />
           </>
         ))}

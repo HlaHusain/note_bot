@@ -22,10 +22,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  // notes: [{ 
-  //   type: mongoose.Types.ObjectId,
-  //   ref:'notes'
-  // }],
+  notes: [{ 
+    type: mongoose.Types.ObjectId,
+    ref:'notes'
+  }],
   courses: [{
     type: mongoose.Types.ObjectId,
     ref:'courses'

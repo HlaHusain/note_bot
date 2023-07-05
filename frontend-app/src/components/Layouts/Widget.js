@@ -12,19 +12,20 @@ const widgetTypes = {
   VIDEO: VideoWidget,
 };
 
-export const Widget = ({ widget, onChange }) => {
+export const Widget = ({ widget, onChange, viewMode }) => {
   const WidgetType = widgetTypes[widget.type];
   return (
     <Box
-      
       sx={{
         borderRadius: "6px",
         border: "1px dashed #575757",
         height: "100%",
-        padding:2,
+        padding: 2,
       }}
     >
-      {!!WidgetType && <WidgetType widget={widget} onChange={onChange} />}
+      {!!WidgetType && (
+        <WidgetType viewMode={viewMode} widget={widget} onChange={onChange} />
+      )}
       {!WidgetType && `Widget of type ${widget.type} is not defined`}
     </Box>
   );

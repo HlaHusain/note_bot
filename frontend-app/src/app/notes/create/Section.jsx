@@ -10,6 +10,7 @@ export function Section({
   onWidgetSelect,
   onWidgetUpdate,
   widgets,
+  viewMode,
 }) {
   if (!section.layout) {
     return (
@@ -26,7 +27,7 @@ export function Section({
     <Grid container minHeight="100%" height="50vh" spacing={2}>
       {section.layout.map((column, index) => (
         <Grid item xs={column}>
-          {!widgets[index] && (
+          {!widgets[index] && !viewMode && (
             <WidgetSelector
               handle={(...args) => onWidgetSelect(...args, section.id)}
               index={index}
@@ -34,6 +35,7 @@ export function Section({
           )}
           {!!widgets[index] && (
             <Widget
+              viewMode={viewMode}
               onChange={(data) => onWidgetUpdate(data, index, section.id)}
               widget={widgets[index]}
             />

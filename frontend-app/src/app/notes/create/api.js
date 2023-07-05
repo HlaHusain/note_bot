@@ -23,13 +23,13 @@ export const getCourses  = async (token,user) =>{
     return data
     }
 
-export const createNote  = async ({token, title , course, user, sections, widgets}) =>{
-
+export const createNote  = async (token, title , course, user, sections, widgets) =>{
+    console.log(title , course, user ,  sections, widgets)
 const response = await fetch(`${url}/notes/` , {
     method : "POST",
     headers:{"Content-type":"application/json",
     Authorization: token},
-    body:JSON.stringify({ title , course_id:course,user_id : user , sections, widgets})
+    body:JSON.stringify({ title , course_id:course,user_id : user , sections: sections, widgets: widgets})
 }
 )
 
