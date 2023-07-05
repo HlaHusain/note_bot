@@ -4,20 +4,34 @@ var cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
 var logger = require("morgan");
 const HttpError = require("./model/http-error");
-var cors = require('cors')
+var cors = require("cors");
+
+var http = require('http');
+//const socketIO = require('socket.io');
+//const { handleConnection } = require('./controllers/chatController');
 
 require("dotenv").config();
 
 //import the routes
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
-var fillRouter = require("./routes/fillDB");
+//var fillRouter = require("./routes/fillDB");
 var notesRouter = require("./routes/notes");
 var coursesRouter = require("./routes/courses");
 var sectionsRouter = require("./routes/sections");
 var widgetsRouter = require("./routes/widgets");
+var chatRouter = require("./routes/chat");
+//var socketHandlers = require("./controllers/socketHandlers");
 
 var app = express();
+/*
+const server = http.createServer(app);
+const io = socketIO(server);
+
+io.on('connection', (socket) => {
+  handleConnection(socket);
+});
+*/
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -41,9 +55,8 @@ app.use((req, res, next) => {
   next();
 });
 
-
-app.use(cors({credentials:true}));
-app.options('*', cors());
+app.use(cors({ credentials: true }));
+app.options("*", cors());
 
 app.use((req, res, next) => {
   res.setHeader("Content-Security-Policy", "default-src 'self'");
@@ -55,11 +68,12 @@ app.use(bodyParser.json()); // support json encoded bodies
 //midellware , initial route filter of paths: ex, '/users','/notes'..
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
-app.use("/fill", fillRouter);
+//app.use("/fill", fillRouter);
 app.use("/notes", notesRouter);
 app.use("/courses", coursesRouter);
 app.use("/sections", sectionsRouter);
 app.use("/widgets", widgetsRouter);
+app.use("/chat", chatRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

@@ -14,6 +14,9 @@ router.get('/course/:keyword', noteController.getNotesByCourseTitle); // Search 
 router.get('/users/:user_id/savednotes', noteController.getSavedNotesByUserId); // Grid view SavedNotes page
 router.post('/users/:user_id/notes/:note_id/save', noteController.saveNote); // Clicking on the save button in the Search page
 
+router.patch('/push_sections', noteController.pushSectionsToNote);
+
+router.get('/note/:note_id', noteController.getNoteByNoteID); // Clicking on a note in the Dashboard page
 // test route
 // router.get('/test', noteController.getNotes);
 

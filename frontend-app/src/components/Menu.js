@@ -29,7 +29,7 @@ export const MenuComponent = () => {
     
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const navigate = useNavigate();
-  const { token ,isAuthorized, logout, user } = useAuth();
+  //const { token ,isAuthorized, logout, user } = useAuth();
   const settings = ["Logout"];
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -100,7 +100,7 @@ export const MenuComponent = () => {
                 {settings.map((setting) => (
                   <MenuItem
                     key={setting}
-                       onClick={logout}
+                     //  onClick={logout}
                   >
                     <Typography textAlign="center">{setting}</Typography>
                   </MenuItem>

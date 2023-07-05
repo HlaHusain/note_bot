@@ -55,6 +55,27 @@ const addWidgetToSection = async (req, res, next) => {
     }
   };
 
+// create widget
+const createWidget = async (req, res, next) => {
+  const { type, data, section_id } = req.body;
+
+  try {
+    // Input validation and error handling...
+
+    const createdWidget = new widgetModel({
+      type,
+      data,
+      section_id,
+    });
+
+    await createdWidget.save();
+
+    res.status(201).json({ message: "Widget created!", widget: createdWidget });
+  } catch (err) {
+    const error = new HttpError("An error occurred while creating the widget.", 500);
+    return next(error);
+  }
+};
 
     //delete widget from section
     //const deleteWidget = async (req, res, next) => { ... }
@@ -64,3 +85,4 @@ const addWidgetToSection = async (req, res, next) => {
 
     exports.getWidgetsBySectionId = getWidgetsBySectionId;
     exports.addWidgetToSection = addWidgetToSection;
+    exports.createWidget = createWidget;

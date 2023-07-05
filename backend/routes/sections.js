@@ -11,5 +11,6 @@ router.patch('/note/:note_id', sectionController.addSectionToNote);
 router.patch('/:section_id/widgets', sectionController.updateSectionWidgets);
 router.delete('/:note_id/:section_id', sectionController.deleteSection);
 
+router.patch('/push_widgets', sectionController.pushWidgetsToSection);
 //export the router
 module.exports = router;

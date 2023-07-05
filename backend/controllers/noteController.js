@@ -107,56 +107,82 @@ const getNotesByCourseTitle = async (req, res, next) => {
   }
 };
 
-// Create a new note
+// // Create a new note
+// const createNote = async (req, res, next) => {
+//   const { user_id, title, isPublic, course_id } = req.body;
+
+//   //console.log(user_id, title, isPublic, course_id);
+
+//   try {
+//     // Input validation
+//     if (!user_id || !title || !course_id) {
+//       return res.status(400).json({ message: "Missing required fields." });
+//     }
+
+//     const [user, course] = await Promise.all([
+//       userModel.findById(user_id),
+//       courseModel.findById(course_id),
+//     ]);
+
+//     // Check if user and course exist
+//     if (!user) {
+//       return res
+//         .status(404)
+//         .json({ message: "Could not find user for the provided id." });
+//     }
+//     if (!course) {
+//       return res
+//         .status(404)
+//         .json({ message: "Could not find course for the provided id." });
+//     }
+
+//     try {
+//       const sess = await mongoose.startSession();
+//       sess.startTransaction();
+//       const createdNote = new noteModel({
+//         title,
+//         notes: noteIds, 
+//       });
+//       await createdNote.save({ session: sess }); //add the note to the database
+//       user.notes.push(createdNote); //push the note to the user
+//       await user.save({ session: sess }); //save the user
+//       await sess.commitTransaction();
+
+//       console.log("createdNote", createdNote);
+
+//       res.status(201).json({ message: "Note created!", note: createdNote });
+//     } catch (error) {
+//       await session.abortTransaction();
+//       throw error;
+//     } finally {
+//       session.endSession();
+//     }
+//   } catch (err) {
+//     const error = new HttpError(
+//       "Creating note failed, please try again later.",
+//       500
+//     );
+//     return next(error);
+//   }
+// };
+
 const createNote = async (req, res, next) => {
   const { user_id, title, isPublic, course_id } = req.body;
-
-  console.log(user_id, title, isPublic, course_id);
-
+  
   try {
-    // Input validation
-    if (!user_id || !title || !course_id) {
-      return res.status(400).json({ message: "Missing required fields." });
-    }
+    // Input validation and error handling...
 
-    const [user, course] = await Promise.all([
-      userModel.findById(user_id),
-      courseModel.findById(course_id),
-    ]);
+    const createdNote = new noteModel({
+      user_id,
+      title,
+      isPublic,
+      course_id,
+      sections: [],
+    });
+    
+    await createdNote.save();
 
-    // Check if user and course exist
-    if (!user) {
-      return res
-        .status(404)
-        .json({ message: "Could not find user for the provided id." });
-    }
-    if (!course) {
-      return res
-        .status(404)
-        .json({ message: "Could not find course for the provided id." });
-    }
-
-    try {
-      const sess = await mongoose.startSession();
-      sess.startTransaction();
-      const createdNote = new noteModel({
-        title,
-        notes: noteIds,
-      });
-      await createdNote.save({ session: sess }); //add the note to the database
-      user.notes.push(createdNote); //push the note to the user
-      await user.save({ session: sess }); //save the user
-      await sess.commitTransaction();
-
-      console.log("createdNote", createdNote);
-
-      res.status(201).json({ message: "Note created!", note: createdNote });
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      session.endSession();
-    }
+    res.status(201).json({ message: "Note created!", note: createdNote });
   } catch (err) {
     const error = new HttpError(
       "Creating note failed, please try again later.",
@@ -165,6 +191,34 @@ const createNote = async (req, res, next) => {
     return next(error);
   }
 };
+
+// push a section to a note
+const pushSectionsToNote = async (req, res, next) => {
+  const { note_id, section_ids } = req.body;
+
+  try {
+    // Input validation and error handling...
+
+    const note = await noteModel.findById(note_id);
+
+    if (!note) {
+      return res.status(404).json({ message: "Note not found." });
+    }
+
+    note.sections.push(...section_ids);
+    await note.save();
+
+    res.status(200).json({ message: "Sections added to note.", note });
+  } catch (err) {
+    const error = new HttpError(
+      "Adding sections to note failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+};
+
+
 
 //update note
 const updateNote = async (req, res, next) => {
@@ -335,6 +389,29 @@ const getNotes = async (req, res, next) => {
   }
 };
 
+const getNoteByNoteID = async (req, res, next) => {
+  const { note_id } = req.params;
+
+  try {
+    const note = await noteModel.findById(note_id);
+
+    if (!note) {
+      return res
+        .status(404)
+        .json({ message: "Could not find note for the provided ID." });
+    }
+
+    res.json({ note: note.toObject({ getters: true }) });
+  } catch (err) {
+    const error = new HttpError(
+      "An error occurred while fetching the note.",
+      500
+    );
+    return next(error);
+  }
+};
+
+
 exports.getNotesByUserIdAndCourseId = getNotesByUserIdAndCourseId;
 exports.getNoteByUserId = getNoteByUserId;
 exports.getNotesByCourseTitle = getNotesByCourseTitle;
@@ -344,3 +421,6 @@ exports.deleteNote = deleteNote;
 
 exports.saveNote = saveNote;
 exports.getSavedNotesByUserId = getSavedNotesByUserId;
+
+exports.getNoteByNoteID = getNoteByNoteID;
+exports.pushSectionsToNote = pushSectionsToNote;
