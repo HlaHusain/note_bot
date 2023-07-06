@@ -23,54 +23,99 @@ const getSectionsByNoteId = async (req, res, next) => {
 
 
 // Creat a new section with empty widgets
-const createSection = async (req, res, next) => {
-    const { note_id, layout_field } = req.body;
+// const createSection = async (req, res, next) => {
+//     const { note_id, layout_field } = req.body;
 
-    try {
-        // Input validation
-        if (!note_id || !layout_field) {
-            return res.status(400).json({ message: "Invalid section data." });
-        }
+//     try {
+//         // Input validation
+//         if (!note_id || !layout_field) {
+//             return res.status(400).json({ message: "Invalid section data." });
+//         }
 
-        const note = await noteModel.findById(note_id);
+//         const note = await noteModel.findById(note_id);
 
-        if (!note) {
-            return res.status(404).json({ message: "Could not find note for the provided id." });
-        }
+//         if (!note) {
+//             return res.status(404).json({ message: "Could not find note for the provided id." });
+//         }
 
-        const session = await mongoose.startSession();
-        session.startTransaction();
+//         const session = await mongoose.startSession();
+//         session.startTransaction();
 
-        try {
-            const createdSection = new sectionModel({
-                layout_field,
-                note_id,
-                widgets: [], // Empty widgets array
-            });
+//         try {
+//             const createdSection = new sectionModel({
+//                 layout_field,
+//                 note_id,
+//                 widgets: [], // Empty widgets array
+//             });
 
-            await createdSection.save({ session });
+//             await createdSection.save({ session });
             
-            // Add the section to the note's sections array
-            note.sections.push(createdSection);
-            await note.save({ session });
+//             // Add the section to the note's sections array
+//             note.sections.push(createdSection);
+//             await note.save({ session });
 
-            await session.commitTransaction();
+//             await session.commitTransaction();
 
-            res.status(201).json({ message: "Section created!", section: createdSection });
-        } catch (error) {
-            await session.abortTransaction();
-            throw error;
-        } finally
-        {
-            session.endSession();
-        }
+//             res.status(201).json({ message: "Section created!", section: createdSection });
+//         } catch (error) {
+//             await session.abortTransaction();
+//             throw error;
+//         } finally
+//         {
+//             session.endSession();
+//         }
+//     } catch (err) {
+//         const error = new HttpError('An error occurred while creating a section.', 500);
+//         return next(error);
+//     }
+// };
+
+const createSection = async (req, res, next) => {
+    const { note_id } = req.body;
+  
+    try {
+      // Input validation and error handling...
+  
+      const createdSection = new sectionModel({
+        note_id,
+        widgets: [],
+      });
+  
+      await createdSection.save();
+  
+      res.status(201).json({ message: "Section created!", section: createdSection });
     } catch (err) {
         const error = new HttpError('An error occurred while creating a section.', 500);
         return next(error);
     }
-};
+  };
 
-
+  //put widgets in a section
+  const pushWidgetsToSection = async (req, res, next) => {
+    const { section_id, widget_ids } = req.body;
+  
+    try {
+      // Input validation and error handling...
+      if (!section_id || !Array.isArray(widget_ids)) {
+        return res.status(400).json({ message: "Invalid request data." });
+      }
+  
+      const section = await sectionModel.findById(section_id);
+      if (!section) {
+        return res.status(404).json({ message: "Section not found." });
+      }
+  
+      section.widgets.push(...widget_ids);
+      await section.save();
+  
+      res.status(200).json({ message: "Widgets added to section.", section });
+    } catch (err) {
+      const error = new HttpError('An error occurred while adding widgets to a section.', 500);
+      return next(error);
+    }
+  };
+  
+  
 // Update a section
 const updateSection = async (req, res, next) => {
     const { section_id } = req.params;
@@ -209,4 +254,4 @@ exports.updateSection = updateSection;
 exports.updateSectionWidgets = updateSectionWidgets;
 exports.deleteSection = deleteSection;
 exports.addSectionToNote = addSectionToNote;
-
+exports.pushWidgetsToSection = pushWidgetsToSection;

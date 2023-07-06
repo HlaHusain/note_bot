@@ -24,6 +24,8 @@ import {
 import { PageHeader } from "../../../components/PageHeader";
 import { useNavigate } from "react-router-dom";
 
+
+
 export const NotesList = () => {
   // const notes1 = [
   //   { id: 1, title: "Topic 1: Status", rating: 4 },

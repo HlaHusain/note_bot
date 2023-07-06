@@ -6,18 +6,31 @@ var logger = require("morgan");
 const HttpError = require("./model/http-error");
 var cors = require("cors");
 
+
 require("dotenv").config();
 
 //import the routes
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
+
 // var fillRouter = require("./routes/fillDB");
+
 var notesRouter = require("./routes/notes");
 var coursesRouter = require("./routes/courses");
 var sectionsRouter = require("./routes/sections");
 var widgetsRouter = require("./routes/widgets");
+var chatRouter = require("./routes/chat");
+//var socketHandlers = require("./controllers/socketHandlers");
 
 var app = express();
+/*
+const server = http.createServer(app);
+const io = socketIO(server);
+
+io.on('connection', (socket) => {
+  handleConnection(socket);
+});
+*/
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -53,13 +66,16 @@ app.use(bodyParser.json()); // support json encoded bodies
 
 //midellware , initial route filter of paths: ex, '/users','/notes'..
 app.use("/users", usersRouter);
+
 app.use(require("./middleware/check-auth"));
 app.use("/", indexRouter);
 // app.use("/fill", fillRouter);
+
 app.use("/notes", notesRouter);
 app.use("/courses", coursesRouter);
 app.use("/sections", sectionsRouter);
 app.use("/widgets", widgetsRouter);
+app.use("/chat", chatRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
