@@ -12,27 +12,27 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 
 export const ChatBot = () => {
-  const [userMessages, setUserMessages] = useState(["what is state and Props?"]);
-  const [botMessages, setBotMessages] = useState([]);
-
-  useEffect(() => {
-    // Bot's response when userMessages array changes
-    const handleBotResponse = () => {
-      // Handle the bot's response here
-      const botResponse = "This is the bot's response.";
-      setBotMessages((prevMessages) => [...prevMessages, botResponse]); 
-      //the useeffect will run again when userMessages changes
-    };
-
-    if (userMessages.length > 0) {
-      handleBotResponse();
-    }
-  }, []);
+  const [messages, setMessages] = useState([
+    { content: "what is state and Props?", sender: "user" },
+    { content: "In React, state and props are two fundamental concepts used to manage and pass data within components.", sender: "bot" },
+  ]);
 
   const handleUserMessageSend = (message) => {
-    setUserMessages((prevMessages) => [...prevMessages, message]);
-     //every time the user sends a message, the userMessages array will be updated and map
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { content: message, sender: "user" },
+    ]);
+  
+    const botResponse = "This is the bot's response.";
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { content: botResponse, sender: "bot" },
+    ]);
   };
+  const handleCopyMessage = (content) => {
+    navigator.clipboard.writeText(content);
+  };
+
   return (
     <Box
       sx={{
@@ -52,76 +52,89 @@ export const ChatBot = () => {
           height: "100%",
         }}
       >
-        {userMessages.map((message, index) => (
-          <Grid
-            container
-            spacing={2}
-            alignItems="center"
-            key={index}
-            sx={{
-              justifyContent: "flex-end",
-              mb: 2,
-            }}
-          >
+        {messages.map((message, index) => (
             <Grid item>
-              <Box
-                sx={{
-                  p: 2,
-                  borderRadius: 3,
-                  backgroundColor: "#ED7D31",
-                  color: "#fff",
-                }}
-              >
-                <Typography variant="body1">{message}</Typography>
-              </Box>
-            </Grid>
-            <Grid item>
-            <Avatar sx={{ bgcolor: "#4472C4" }}>YA</Avatar>
-            </Grid>
-          </Grid>
-        ))}
+              {message.sender === "user" ? (
+                <Grid
+                container
+                spacing={2}
+                alignItems="center"
+                display="flex"
+                flexWrap="wrap-reverse"
 
-    {userMessages.length > 0 && botMessages.map((message, index) =>  (
-          <Grid
-            container
-            spacing={2}
-            alignItems="center"
-            key={index}
-            sx={{
-              justifyContent: "flex-start",
-              mb: 2,
-            }}
-          >
-            <Grid item>
-              <Avatar alt="Bot" src={bot} />
-            </Grid>
-            <Grid item>
-              <Box
+                key={index}
                 sx={{
-                  p: 2,
-                  borderRadius: 3,
-                  backgroundColor: "#4472C4",
-                  color: "#fff",
+                  justifyContent: "flex-end",
+                  mb: 2,
                 }}
               >
-                <Typography variant="body1">{message}</Typography>
-              </Box>
-            </Grid>
-            <Grid
-              container
-              spacing={2}
-              alignItems="center"
-              sx={{ justifyContent: "flex-end", marginTop: "0" }}
-            >
-              <Grid item sx={{ display: "flex", justifyContent: "flex-end" }}>
-                <ContentCopyIcon fontSize="13" />
-                <Typography variant="body1" fontSize={13}>
-                  COPY ANSWER
-                </Typography>
+                <Grid item>
+                  <Box
+                    sx={{
+                      p: 2,
+                      borderRadius: 3,
+                      backgroundColor: "#ED7D31",
+                      color: "#fff",
+                    }}
+                  >
+                    <Typography variant="body1">{message.content}</Typography>
+                  </Box>
+                </Grid>
+                <Grid item>
+                <Avatar sx={{ bgcolor: "#4472C4" }}>YA</Avatar>
+                </Grid>
               </Grid>
+              
+              
+              ) : (
+                <Grid
+                container
+                spacing={2}
+                alignItems="center"
+                key={index}
+                sx={{
+                  justifyContent: "flex-start",
+                  mb: 2,
+                }}
+              >
+                <Grid item>
+                  <Avatar alt="Bot" src={bot} />
+                </Grid>
+                <Grid item>
+                  <Box
+                    sx={{
+                      p: 2,
+                      borderRadius: 3,
+                      backgroundColor: "#4472C4",
+                      color: "#fff",
+                    }}
+                  >
+                    <Typography variant="body1">{message.content}</Typography>
+                  </Box>
+                </Grid>
+                <Grid
+                  container
+                  spacing={2}
+                  alignItems="center"
+                  sx={{ justifyContent: "flex-end", marginTop: "0" }}
+                >
+          <Grid item sx={{ display: "flex", justifyContent: "flex-end" }}>
+                  <ContentCopyIcon
+                    fontSize="13"
+                    onClick={() => handleCopyMessage(message.content)}
+                    style={{ cursor: "pointer" }}
+                  />
+                  <Typography variant="body1" fontSize={13}>
+                    COPY ANSWER
+                  </Typography>
+                </Grid>
+                </Grid>
+              </Grid>
+              )}
             </Grid>
-          </Grid>
+
         ))}
+        
       </Box>
       {/* send button */}
       <Grid container spacing={2} alignItems="center" sx={{ padding: 2 }}>
