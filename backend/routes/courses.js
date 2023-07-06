@@ -12,5 +12,3 @@ router.get('/test', courseController.getAllCourses); // Show more link in the Co
 
 //export the router
 module.exports = router;
-
-

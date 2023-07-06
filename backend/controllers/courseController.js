@@ -141,3 +141,4 @@ exports.getAllCourses = getAllCourses;
 exports.getCoursesByUserId = getCoursesByUserId;
 exports.deleteCourseWithNotes = deleteCourseWithNotes;
 exports.createCourse = createCourse;
+

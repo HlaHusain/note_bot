@@ -59,7 +59,7 @@ export const MenuComponent = () => {
         <Container maxWidth="l">
           <Toolbar disableGutters>
             <Link to="/">
-              <Logo width={180} height={50} src="./logo.png" />
+              <Logo width={180} height={50} src="/logo.png" />
             </Link>
             <Box
               sx={{
