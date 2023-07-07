@@ -4,6 +4,7 @@
 * It was initially developed by [Hla Abuhamra](https://github.com/HlaHusain), [Yusra Abdulrahman](https://github.com/Yusra-3033), [Hadeel Saleh](https://github.com/hadeelalzenaty-web), and [Hadil Khbaiz]() in the frame of the AWT course in summer semester 2023.
 
 * It was created with React, Nodejs, Express, Mongoose, MongoDB Atlas, OpenAi, and ChatGPT `gpt-3.5-turbo` model.
+![image](https://github.com/HlaHusain/note_bot/assets/72098393/46c32532-51a0-4327-ba42-03126ba7c80a)
 
 
 
