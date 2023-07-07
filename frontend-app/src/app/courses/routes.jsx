@@ -2,7 +2,6 @@ import { CreateCourseDialog } from "./create";
 import { CoursesList } from "./list";
 import { SearchByCourse } from "./search";
 
-
 export const routes = [
   {
     path: "/courses",
@@ -15,5 +14,5 @@ export const routes = [
   {
     path: "/search/:keyword",
     element: <SearchByCourse />,
-  }
+  },
 ];

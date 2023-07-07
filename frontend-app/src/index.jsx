@@ -15,7 +15,8 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { GuestsRoute } from "./components/GuestsRoute";
 import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
 import { theme } from "./theme";
-import { ChatBot } from "./app/chatbot/chatbot";
+// import { ChatBot } from "./app/chatbot/chatbot";
+import { ChatGPT } from "./app/ChatGPT";
 
 const Auth = () => {
   return (
@@ -46,7 +47,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           {courseRoutes.map((route) => (
             <Route key={route.path} {...route} />
           ))}
-          <Route path="/chat" element={<ChatBot />} />
+          <Route path="/chat" element={<ChatGPT />} />
           <Route path="/signup" element={<SignupForm />} />
           <Route path="/login" element={<LoginForm />} />
         </Routes>
