@@ -1,8 +1,8 @@
 # NoteBot App:
 * NoteBot is a web application that enables students to co-create lecture notes, supported by generative AI models (e.g., ChatGPT).
-* 
-* It was initially developed by [Hla Abuhamra](https://github.com/HlaHusain), [Yusra Abdulrahman](https://github.com/Yusra-3033), [Hadeel Saleh], and [Hadil Khbaiz] in the frame of the AWT course in summer semester 2023.
-* 
+
+* It was initially developed by [Hla Abuhamra](https://github.com/HlaHusain), [Yusra Abdulrahman](https://github.com/Yusra-3033), [Hadeel Saleh](https://github.com/hadeelalzenaty-web), and [Hadil Khbaiz]() in the frame of the AWT course in summer semester 2023.
+
 * It was created with React, Nodejs, Express, Mongoose, MongoDB Atlas, OpenAi, and ChatGPT `gpt-3.5-turbo` model.
 
 
