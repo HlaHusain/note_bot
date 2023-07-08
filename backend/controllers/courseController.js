@@ -23,7 +23,7 @@ const getAllCourses = async (req, res, next) => {
 
 //Get courses by user_id
 const getCoursesByUserId = async (req, res, next) =>{
-  const { user_id } = req.params;
+  const user_id = req.userData.userId;
 
   try {
     const user = await userModel.findById(user_id).populate("courses");
@@ -48,7 +48,8 @@ const getCoursesByUserId = async (req, res, next) =>{
 
 //Create a new course
 const createCourse = async (req, res, next) => {
-  const { user_id, title } = req.body;
+  const {  title } = req.body;
+  const user_id = req.userData.userId;
   let session; // Declare the session variable
 
   try {

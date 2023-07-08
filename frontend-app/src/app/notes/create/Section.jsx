@@ -13,20 +13,21 @@ export function Section({
   widgets,
   viewMode,
 }) {
-  if (!section.layout) {
+  const hasLayout = section.layout_field && section.layout_field.length > 0;
+  if (!hasLayout) {
     return (
       <LayoutSelector
-        onLayoutSelect={(layout) =>
+        onLayoutSelect={(layout_field) =>
           onChange(section.id, {
-            layout: layout,
+            layout_field,
           })
         }
       />
     );
   }
   return (
-    <Grid container minHeight="100%" height="50vh" spacing={2}>
-      {section.layout.map((column, index) => (
+    <Grid container spacing={2}>
+      {section.layout_field.map((column, index) => (
         <Grid item xs={column}>
           {!widgets[index] && !viewMode && (
             <WidgetSelector
