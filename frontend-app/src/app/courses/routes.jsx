@@ -1,5 +1,7 @@
-import { CreateCourse } from "./create";
+import { CreateCourseDialog } from "./create";
 import { CoursesList } from "./list";
+import { SearchByCourse } from "./search";
+
 
 export const routes = [
   {
@@ -7,8 +9,11 @@ export const routes = [
     element: <CoursesList />,
   },
   {
-    path: "/note",
-    element: <CreateCourse />,
+    path: "/create-course",
+    element: <CreateCourseDialog />,
   },
-
+  {
+    path: "/search/:keyword",
+    element: <SearchByCourse />,
+  }
 ];

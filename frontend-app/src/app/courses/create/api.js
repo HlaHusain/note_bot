@@ -1,21 +1,22 @@
-import url from '../../../config'
-const course  = async ({token,course}) =>{
+const API_BASE_URL = 'http://localhost:3000';
 
-const response = await fetch(`${url}/course/` , {
-    method : "POST",
-    headers:{"Content-type":"application/json",
-    Authorization: token},
-    body:JSON.stringify({course})
-}
-)
-
-const data = await response.json()
-if(!response.ok){
-let error = new Error("Http status code" +response.status )
-error.data=data;
-error.status=response.status ;
-throw error
-}
-
-return data
-}
+// Create a new course
+export const createCourse = async (user_id, title) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/courses`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ user_id, title }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        return data.course;
+      } else {
+        throw new Error(data.message || 'Failed to create a new course.');
+      }
+    } catch (error) {
+      throw new Error('Failed to create a new course.');
+    }
+  };
