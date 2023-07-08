@@ -10,10 +10,10 @@ export const WidgetSelector = ({ handle, index }) => {
       alignItems={"center"}
       justifyContent={"center"}
       sx={{
-        padding:2,
         borderRadius: "6px",
         border: "1px dashed #575757",
-        height: "100%",
+        height:"100%",
+        padding: 4
       }}
     >
       <Stack justifyContent={"center"} alignContent={"center"}>

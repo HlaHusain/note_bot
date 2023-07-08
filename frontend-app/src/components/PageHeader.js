@@ -6,6 +6,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { Divider, TextField } from "@mui/material";
 import { Typography, Button } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+
 import Stack from "@mui/material/Stack";
 
 export const PageHeader = ({
@@ -18,6 +19,7 @@ export const PageHeader = ({
   const handleChange = (e) => {
     onChange(e.target.value);
   };
+
   return (
     <>
       <Grid container alignItems="center" justifyContent="space-between">
@@ -35,7 +37,7 @@ export const PageHeader = ({
           {!!isEditable && <EditIcon />}
         </Stack>
         <Stack spacing={1} direction="row">
-          {actions.map(({ label, ...action }) => (
+          {actions.map(({ label,  ...action }) => (
             <Button
               color="primary"
               startIcon={<AddIcon />}

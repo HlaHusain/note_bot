@@ -299,7 +299,7 @@ const createNote = async (req, res, next) => {
 
     for (const section of sections) {
       const sectionObject = new sectionModel({
-        layout_field: section.layout,
+        layout_field: section.layout_field,
         note_id: createdNote._id,
       });
       await sectionObject.save({ session });
@@ -353,42 +353,41 @@ const createNote = async (req, res, next) => {
 
 
 //update note
-const updateNote = async (req, res, next) => {
-  const { title, isPublic, course_id } = req.body;
-  const note_id = req.params.note_id;
+// const updateNote = async (req, res, next) => {
+//   const { title, isPublic, course_id } = req.body;
+//   const note_id = req.params.note_id;
 
-  try {
-    let note = await noteModel.findById(note_id);
+//   try {
+//     let note = await noteModel.findById(note_id);
 
-    if (!note) {
-      return res
-        .status(404)
-        .json({ message: "Could not find note for the provided id." });
-    }
+//     if (!note) {
+//       return res
+//         .status(404)
+//         .json({ message: "Could not find note for the provided id." });
+//     }
 
-    note.title = title;
-    note.isPublic = isPublic;
-    note.course_id = course_id;
+//     note.title = title;
+//     note.isPublic = isPublic;
+//     note.course_id = course_id;
 
-    note = await note.save();
+//     note = await note.save();
 
-    res.status(200).json({
-      message: "Note updated!",
-      note: note.toObject({ getters: true }),
-    });
-  } catch (err) {
-    console.log("error", err);
-    const error = new HttpError(
-      "Updating note failed, please try again later.",
-      500
-    );
-    return next(error);
-  }
-};
+//     res.status(200).json({
+//       message: "Note updated!",
+//       note: note.toObject({ getters: true }),
+//     });
+//   } catch (err) {
+//     console.log("error", err);
+//     const error = new HttpError(
+//       "Updating note failed, please try again later.",
+//       500
+//     );
+//     return next(error);
+//   }
+// };
 
 //delete note
 const deleteNote = async (req, res, next) => {
-  const { user_id, course_id } = req.params;
   const note_id = req.params.note_id;
 
   try {
@@ -562,6 +561,83 @@ const getNoteWidgets = async (req, res, next) => {
   }
 };
 
+const updateNote = async (req, res, next) => {
+  try {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    const user_id = req.userData.userId;
+
+    const { title, sections, widgets, course } = req.body;
+
+    const note = await noteModel.findById(req.params.note_id);
+
+    if (!note) {
+      return res
+        .status(404)
+        .json({ message: "Could not find note for the provided id." });
+    }
+
+    note.title = title;
+    note.course_id = course;
+
+    await note.save({ session });
+
+    for (const section of sections) {
+      let sectionObject =
+        section._id && (await sectionModel.findById(section._id));
+
+      if (!sectionObject) {
+        sectionObject = new sectionModel();
+      }
+
+      sectionObject.layout_field = section.layout_field || undefined;
+      sectionObject.note_id = note._id;
+
+      await sectionObject.save({ session });
+
+      if (!note.sections.find((_id) => _id === sectionObject._id)) {
+        note.sections.push(sectionObject._id);
+        await note.save({ session });
+      }
+
+      const sectionWidgets = widgets[section._id || section.id];
+      if (sectionWidgets) {
+        for (let widgetIndex in sectionWidgets) {
+          const widget = sectionWidgets[widgetIndex];
+
+          let widgetObject =
+            widget._id && (await widgetModel.findById(widget._id));
+
+          if (!widgetObject) {
+            widgetObject = new widgetModel();
+          }
+
+          widgetObject.type = widget.type;
+          widgetObject.data = widget.data;
+          widgetObject.layout_index = parseInt(widgetIndex);
+          widgetObject.section_id = sectionObject._id;
+
+          await widgetObject.save({ session });
+
+          sectionObject.widgets.push(widgetObject._id);
+        }
+        await sectionObject.save({ session });
+      }
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    res.json({ note, sections, widgets });
+  } catch (err) {
+    console.log(err);
+    const error = new HttpError(
+      "An error occurred while fetching notes. ",
+      500
+    );
+    return next(error);
+  }
+};
 
 exports.getNoteWidgets = getNoteWidgets;
 

@@ -27,35 +27,11 @@ import { useNavigate } from "react-router-dom";
 
 
 export const NotesList = () => {
-  // const notes1 = [
-  //   { id: 1, title: "Topic 1: Status", rating: 4 },
-  //   { id: 2, title: "Note 2", rating: 3 },
-  //   { id: 3, title: "Note 3", rating: 5 },
-  //   { id: 4, title: "Note 4", rating: 6 },
-  //   { id: 5, title: "Note 5", rating: 4 },
-  //   { id: 6, title: "Note 6", rating: 3 },
-  //   { id: 7, title: "Note 7", rating: 5 },
-  //   { id: 8, title: "Note 8", rating: 6 },
-  // ];
-
-  // const notes2 = [
-  //   { id: 9, title: "Topic 1 in ILE", rating: 4 },
-  //   { id: 10, title: "Notes in AI Ethics", rating: 3 },
-  //   { id: 11, title: "Notes in CTAT", rating: 5 },
-  //   { id: 12, title: "Notes in FIAT", rating: 6 },
-  //   { id: 13, title: "Note 5", rating: 4 },
-  //   { id: 14, title: "Note 6", rating: 3 },
-  //   { id: 15, title: "Note 7", rating: 5 },
-  //   { id: 16, title: "Note 8", rating: 6 },
-  // ];
+   
   const [showMore, setShowMore] = React.useState(false);
   const handleShowMoreClick = () => {
     setShowMore(true);
-  };
-
-  // const visibleNotes1 = showMore ? notes1 : notes1.slice(0, 4);
-  // const visibleNotes2 = showMore ? notes2 : notes2.slice(0, 4);
-
+  }; 
   const [notes, setNotes] = useState([]);
   const { token, user, saveUser, logout, isAuthorized } = useAuth();
 
@@ -68,6 +44,7 @@ export const NotesList = () => {
     notesList();
   }, []);
 
+ 
   return (
     <Container maxWidth="md" sx={{ marginTop: 5 }}>
       <PageHeader
@@ -107,7 +84,9 @@ export const NotesList = () => {
                 {note &&
                   note.notes.map((note) => (
                     <Grid item={true} xs={12} sm={6} md={4} key={note.id}>
-                      <Card sx={{ bgcolor: "#E8E8E8", borderRadius: 2 }}>
+                      <Card
+                      onClick={() => navigate(`/notes/${note._id}`)}
+                      sx={{ bgcolor: "#E8E8E8", borderRadius: 2, cursor:"pointer" }}>
                         <CardHeader
                           action={
                             <Box sx={{ display: "flex" }}>

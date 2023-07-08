@@ -5,8 +5,6 @@ const collectionName_sections = "sections";
 const sectionSchema = new mongoose.Schema({
   layout_field: {
     type: [Number],
-    default: [],
-    required: true,
   },
   note_id: {
     type: mongoose.Types.ObjectId,

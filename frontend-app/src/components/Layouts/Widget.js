@@ -20,7 +20,7 @@ export const Widget = ({ widget, onChange, viewMode }) => {
         borderRadius: "6px",
         border: "1px dashed #575757",
         height: "100%",
-        padding: 2,
+
       }}
     >
       {!!WidgetType && (
