@@ -1,12 +1,10 @@
-const API_BASE_URL = 'http://localhost:3000';
+import { url } from "../../../config";
 
 // Get all courses
-export const getAllCourses = async () => {
+export const getAllCourses = async (token) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/courses`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
+    const response = await fetch(`${url}/courses`, {
+      headers: { "Content-type": "application/json", Authorization: token },
     });
     const data = await response.json();
     if (response.ok) {
@@ -20,12 +18,10 @@ export const getAllCourses = async () => {
 };
 
 // Get courses by user ID
-export const getCoursesByUserId = async (user_id) => {
+export const getCoursesByUserId = async (user_id,token) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/courses/user/${user_id}`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
+    const response = await fetch(`${url}/courses/user/${user_id}`, {
+      headers: { "Content-type": "application/json", Authorization: token },
     });
     const data = await response.json();
     if (response.ok) {
@@ -39,13 +35,11 @@ export const getCoursesByUserId = async (user_id) => {
 };
 
 // Create a new course
-export const createCourse = async (user_id, title) => {
+export const createCourse = async (user_id, title,token) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/courses`, {
+    const response = await fetch(`${url}/courses`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { "Content-type": "application/json", Authorization: token },
       body: JSON.stringify({ user_id, title }),
     });
     const data = await response.json();
@@ -60,13 +54,11 @@ export const createCourse = async (user_id, title) => {
 };
 
 // Delete a course and its notes
-export const deleteCourseWithNotes = async (course_id) => {
+export const deleteCourseWithNotes = async (course_id,token) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/courses/${course_id}`, {
+    const response = await fetch(`${url}/courses/${course_id}`, {
       method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { "Content-type": "application/json", Authorization: token },
     });
     if (!response.ok) {
       throw new Error('Failed to delete the course.');

@@ -20,6 +20,7 @@ var coursesRouter = require("./routes/courses");
 var sectionsRouter = require("./routes/sections");
 var widgetsRouter = require("./routes/widgets");
 var chatRouter = require("./routes/chat");
+var chatbotRouter = require("./controllers/chatbotController");
 //var socketHandlers = require("./controllers/socketHandlers");
 
 var app = express();
@@ -75,7 +76,9 @@ app.use("/notes", notesRouter);
 app.use("/courses", coursesRouter);
 app.use("/sections", sectionsRouter);
 app.use("/widgets", widgetsRouter);
-app.use("/chat", chatRouter);
+app.use('/chat', chatbotRouter); // Mount the chatbotController as a middleware
+// app.use("/chat", chatRouter);
+
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

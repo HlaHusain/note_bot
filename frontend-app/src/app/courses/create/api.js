@@ -1,14 +1,12 @@
-const API_BASE_URL = 'http://localhost:3000';
+import { url } from "../../../config";
 
 // Create a new course
-export const createCourse = async (user_id, title) => {
+export const createCourse = async (user, title,token) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/courses`, {
+      const response = await fetch(`${url}/courses`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ user_id, title }),
+        headers: { "Content-type": "application/json", Authorization: token },
+        body: JSON.stringify({ user, title }),
       });
       const data = await response.json();
       if (response.ok) {

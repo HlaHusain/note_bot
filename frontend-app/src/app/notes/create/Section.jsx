@@ -14,7 +14,7 @@ export function Section({
   viewMode,
 }) {
   const hasLayout = section.layout_field && section.layout_field.length > 0;
-  if (!hasLayout) {
+  if (!hasLayout && !viewMode) {
     return (
       <LayoutSelector
         onLayoutSelect={(layout_field) =>
@@ -24,6 +24,10 @@ export function Section({
         }
       />
     );
+  }
+
+  if (!hasLayout) {
+    return null;
   }
   return (
     <Grid container spacing={2}>

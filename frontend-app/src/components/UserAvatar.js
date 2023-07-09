@@ -10,10 +10,6 @@ export const AvatarComponent = () => {
     fontSize: 16,
     fontWeight: "bold",
   };
-  
-  return (
-    <Avatar sx={avatarStyle}>
-      YA
-    </Avatar>
-  );
+
+  return <Avatar sx={avatarStyle} src="/static/images/avatar/2.jpg" />;
 };

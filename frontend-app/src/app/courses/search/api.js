@@ -1,12 +1,9 @@
-const API_BASE_URL = 'http://localhost:3000';
+import { url } from "../../../config";
 
-export const getNotesByCourseTitle = async (keyword) => {
+export const getNotesByCourseTitle = async (keyword,token) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/notes/search/${keyword}`, {
-        headers: {
-          "Content-Type": "application/json",
-        //   Authorization: `Bearer ${authToken}`,
-        },
+      const response = await fetch(`${url}/notes/search/${keyword}`, {
+        headers: { "Content-type": "application/json", Authorization: token },
       });
   
       if (!response.ok) {

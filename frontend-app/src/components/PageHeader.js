@@ -16,6 +16,7 @@ export const PageHeader = ({
   onChange,
   label,
 }) => {
+  actions = actions || []
   const handleChange = (e) => {
     onChange(e.target.value);
   };

@@ -10,18 +10,23 @@ import {
   Button,
 } from "@mui/material";
 import { createCourse } from "./api";
+import { useAuth } from "../../../contexts/AuthProvider";
 
-export const CreateCourseDialog = ({ isOpen, onClose, user_id, setCourses }) => {
+export const CreateCourseDialog = ({ isOpen, onClose,courses , user_id, setCourses }) => {
   const [courseTitle, setCourseTitle] = useState("");
-
+  const { token, user} = useAuth();
   const handleAddCourse = async() => {
     try {
-      const newCourse = await createCourse(user_id, courseTitle);
+      const newCourse = await createCourse(user, courseTitle,token);
 
       console.log("Created course:", newCourse);
 
       // Update the courses list state
       setCourses((prevCourses) => [...prevCourses, newCourse]);
+
+      console.log('courses === ' , courses)
+
+
 
       // Close the dialog
       onClose();

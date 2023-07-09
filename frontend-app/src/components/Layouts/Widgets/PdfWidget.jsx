@@ -55,8 +55,8 @@ export function PdfWidget({ widget, onChange, viewMode }) {
           <input type="file" hidden multiple onChange={handleChange} />
         </Button>
       )}
-
       {!!url && <iframe height={"100%"} width={"100%"} src={url} />}
+      {!url && <Box sx={{ padding: 4 }}>PDF File is not defined.</Box>}
     </Stack>
   );
 }

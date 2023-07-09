@@ -4,10 +4,16 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Unstable_Grid2";
-import { Button, Container, Stack, TextField } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  Container,
+  Stack,
+  TextField,
+} from "@mui/material";
 import { isEmpty, isEmail } from "../../utils/validators";
 import { Image } from "../../components/Image";
-import {login, signup} from './api'
+import { login, signup } from "./api";
 
 export const SignupForm = () => {
   const navigate = useNavigate();
@@ -21,14 +27,13 @@ export const SignupForm = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState({});
-  const [redirect,doRedirect]=useState(false);
+  const [redirect, doRedirect] = useState(false);
 
-
-useEffect(()=>{
-  if(redirect){
-    navigate("/")
-  }
-},[redirect])
+  useEffect(() => {
+    if (redirect) {
+      navigate("/");
+    }
+  }, [redirect]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -44,21 +49,24 @@ useEffect(()=>{
       return;
     }
     setErrors({});
-    try{
-    //Fetch POST request
-    setLoading(true);
-    console.log('start ... ' , data)
-    const res = await signup(data.email,data.password,data.username,data.study);
-    console.log('res == ', res)
-    localStorage.setItem("token" , res.token )
-    localStorage.setItem("user" , res.userId )
-    setResponse(res)
-    doRedirect(true)
-    }catch(error){
-      setResponse(error.data)
+    try {
+      //Fetch POST request
+      setLoading(true);
+      console.log("start ... ", data);
+      const res = await signup(
+        data.email,
+        data.password,
+        data.username,
+        data.study
+      );
+      console.log("res == ", res);
+      localStorage.setItem("token", res.token);
+      localStorage.setItem("user", res.userId);
+      setResponse(res);
+      doRedirect(true);
+    } catch (error) {
+      setResponse(error.data);
     }
-
-
   };
 
   const handleChange = (e) => {
@@ -75,15 +83,16 @@ useEffect(()=>{
       component="form"
       onSubmit={onSubmit}
     >
-      <Grid container spacing={4}
-                sx={{
-                  justifyContent: "center",
-                  alignItems: "center",
-                  padding:2,
-                  marginTop:4
-
-                  
-                }}>
+      <Grid
+        container
+        spacing={4}
+        sx={{
+          justifyContent: "center",
+          alignItems: "center",
+          padding: 2,
+          marginTop: 4,
+        }}
+      >
         <Grid
           item
           xs={12}
@@ -109,7 +118,7 @@ useEffect(()=>{
         >
           <Stack spacing={3} margin={2}>
             <TextField
-              // required
+              required
               label="User Name"
               id="outlined-required"
               value={data.username}
@@ -126,7 +135,7 @@ useEffect(()=>{
             />
 
             <TextField
-              // required
+              required
               type="email"
               label="Email"
               id="outlined-required"
@@ -144,7 +153,7 @@ useEffect(()=>{
             />
 
             <TextField
-              // required
+              required
               label="Password"
               id="outlined-required"
               value={data.password}
@@ -162,7 +171,7 @@ useEffect(()=>{
             />
 
             <TextField
-              // required
+              required
               label="Study Field"
               id="outlined-required"
               value={data.study}
@@ -182,37 +191,38 @@ useEffect(()=>{
               type="submit"
               disabled={loading}
               size="large"
-              variant="outlined"
+              variant="contained"
               fullWidth
+              startIcon={
+                loading && <CircularProgress color="inherit" size={16} />
+              }
               sx={{
-                background: "#ED7D31",
-                borderRadius: 2,
-                color: "#FFFFFF",
-                alignItems: "left",
                 padding: 1.5,
-                border: "0",
-                "&:hover": {
-                  color: "#fff",
-                  background: "#fed3cd",
-                  border: "0",
-                },
               }}
             >
               Register
             </Button>
 
-            <Box   sx={{
-                    color: "#6FADE6",
-                    // border: "solid 1px #fecaca",
-                    marginBottom: 2,
-                    fontSize: 14,
-                    display:'flex',
-                    justifyContent: "center",
-                    padding:1,
-                  }}>
+            <Box
+              sx={{
+                color: "#6FADE6",
+                // border: "solid 1px #fecaca",
+                marginBottom: 2,
+                fontSize: 14,
+                display: "flex",
+                justifyContent: "center",
+                padding: 1,
+              }}
+            >
               <Box>Already have account ? </Box>
-              <Link to='/login' sx={{color: "#6FADE6",textDecoration: "none",}}> Login</Link>
-              </Box>
+              <Link
+                to="/login"
+                sx={{ color: "#6FADE6", textDecoration: "none" }}
+              >
+                {" "}
+                Login
+              </Link>
+            </Box>
 
             {/* {(response && response["status"] === 400 || response["status"] === 401) && (
               <Box

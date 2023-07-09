@@ -1,205 +1,187 @@
 import React, { useState, useEffect, useRef } from "react";
-import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
-import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
-import { chatCompletion } from "./api";
-import { toast } from "react-toastify";
-import TypeWriter from "typewriter-effect";
-import { useNavigate } from "react-router-dom";
 import {
-  Stack,
+  Avatar,
   Box,
-  Typography,
-  IconButton,
-  FormControl,
-  OutlinedInput,
+  Button,
   CircularProgress,
+  Grid,
+  IconButton,
+  Stack,
+  TextField,
+  Typography,
+  styled,
 } from "@mui/material";
+import SendIcon from "@mui/icons-material/Send";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import axios from "axios";
+import { useAuth } from "../../contexts/AuthProvider";
+import chatCompletion from "./api";
+import TextareaAutosize from "@mui/base/TextareaAutosize";
 
-const messageType = {
-  answer: "answer",
-  question: "question",
+const Root = styled("div")(() => ({
+  position: "fixed",
+  bottom: 60,
+  right: 80,
+  height: "min(400px, calc(100vh - 50px))",
+  display: "flex",
+  flexDirection: "column",
+  background: "#fff",
+  border: "1px solid #C1C1C1",
+  borderRadius: 4,
+  width: 300,
+}));
+
+const MessagesContainer = styled(Stack)(({ theme }) => ({
+  flex: 1,
+  overflowY: "auto",
+  padding: theme.spacing(3),
+}));
+
+const StyledTextareaAutosize = styled(TextareaAutosize)(({ theme }) => ({
+  width: "100%",
+  border: "none",
+  padding: theme.spacing(1, 4, 1, 2),
+  background: theme.palette.grey[100],
+  borderRadius: 15,
+}));
+export const Chatbot = () => {
+  const [messages, setMessages] = useState([]);
+  const [isBotReply, setIsBotReply] = useState(true);
+  const [botResponsesCount, setBotResponsesCount] = useState(0);
+  const messagesEndRef = useRef(null);
+  const { token, user } = useAuth();
+
+  const handleUserMessageSend = async (message) => {
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { role: "user", content: message },
+    ]);
+    setIsBotReply(false);
+
+    try {
+      const res = await chatCompletion(message, token);
+
+      // Add ChatGPT's response to the chat
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { role: "bot", content: res.response },
+      ]);
+
+      setIsBotReply(true);
+      setBotResponsesCount((prevCount) => prevCount + 1);
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
+
+  useEffect(() => {
+    // Scroll to the bottom after a new bot response is received
+    scrollToBottom();
+  }, [botResponsesCount]); // Trigger effect when botResponsesCount changes
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  return (
+    <Root>
+      <MessagesContainer spacing={2}>
+        {messages.map((message, index) => (
+          <Message key={index} message={message} />
+        ))}
+        <div ref={messagesEndRef} />
+      </MessagesContainer>
+      {/* send button */}
+
+      <Box sx={{ position: "relative", p: 1 }}>
+        <StyledTextareaAutosize
+          placeholder={isBotReply ? "Type your message..." : "Please wait..."}
+          disabled={!isBotReply}
+          onKeyDown={(event) => {
+            if (
+              event.key === "Enter" &&
+              !event.shiftKey &&
+              event.target.value.trim()
+            ) {
+              handleUserMessageSend(event.target.value);
+              event.target.value = "";
+            }
+          }}
+        />
+
+        <IconButton
+          size="small"
+          sx={{
+            position: "absolute",
+            right: 11,
+            top: 11,
+          }}
+          disabled={!isBotReply}
+        >
+          {isBotReply && (
+            <SendIcon style={{ color: "#ED7D31", fontSize: 16 }} />
+          )}
+          {!isBotReply && <CircularProgress size={14} />}
+        </IconButton>
+      </Box>
+    </Root>
+  );
 };
 
-export const ChatBot = () => {
-  const navigate = useNavigate();
-  const inputRef = useRef();
-  const chatWrapperRef = useRef();
+const Message = ({ message }) => {
+  const role = (
+    <Avatar
+      sx={{
+        width: 32,
+        height: 32,
+        bgcolor: "#4472C4",
+      }}
+      src={message.role !== "user" ? "/chatBot.png" : undefined}
+    ></Avatar>
+  );
 
-  const [onRequest, setOnRequest] = useState(false);
-  const [question, setQuestion] = useState("");
-  const [messages, setMessages] = useState([]);
-
-  const getAnswer = async () => {
-    if (onRequest) return;
-
-    const newMessages = [
-      ...messages,
-      {
-        type: messageType.question,
-        content: question,
-      },
-    ];
-
-    setMessages(newMessages);
-    setQuestion("");
-    setOnRequest(true);
-
-    const { response, err } = await chatCompletion({ prompt: question });
-
-    if (response) {
-      setMessages([
-        ...newMessages,
-        {
-          type: messageType.answer,
-          content: response.text,
-        },
-      ]);
-    }
-
-    if (err) {
-      toast.error(err.message);
-      setOnRequest(false);
-    }
+  const handleCopyMessage = (content) => {
+    navigator.clipboard.writeText(content);
   };
-
-  const onEnterPress = (e) => {
-    if (e.keyCode === 13) getAnswer();
-  };
-
-  const onSignOut = () => {
-    localStorage.removeItem("tkn");
-    navigate("/");
-  };
-
-  //Scroll to the bottom of the chat
-  useEffect(() => {
-    setTimeout(() => {
-      chatWrapperRef.current.addEventListener("DOMNodeInserted", (e) => {
-        e.currentTarget.scroll({
-          top: e.currentTarget.scrollHeight,
-          behavior: "smooth",
-        });
-      });
-    }, 200);
-  }, []);
 
   return (
     <div>
-      <Box
+      <Stack
         sx={{
           display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "20px",
+          justifyContent: message.role === "user" ? "flex-end" : undefined,
         }}
+        direction={"row"}
+        spacing={1}
       >
-        <Typography
-          variant="h5"
-          fontWeight="bold"
-          sx={{ color: "#F76D16", marginLeft: "20px" }}
-        >
-          ChatGPT
-        </Typography>
-        <IconButton onClick={onSignOut} sx={{ color: "#F76D16" }}>
-          <LogoutOutlinedIcon />
-        </IconButton>
-      </Box>
-      <Box
-        ref={chatWrapperRef}
-        sx={{
-          height: "calc(100vh - 180px)",
-          overflowY: "auto",
-          paddingTop: "10px",
-          paddingBottom: "10px",
-          backgroundColor: "#F5F5F5",
-          borderRadius: "8px",
-        }}
-      >
-        <Stack
-          spacing={1}
-          sx={{ padding: "20px", maxWidth: "800px", margin: "auto" }}
-        >
-          {messages.map((item, index) => (
-            <Box
-              key={index}
-              sx={{
-                display: "flex",
-                justifyContent: item.type === messageType.answer ? "flex-end" : "flex-start",
-              }}
-            >
-              <Box
-                sx={{
-                  maxWidth: "80%",
-                  backgroundColor:
-                    item.type === messageType.answer ? "#F76D16" : "#FFFFFF",
-                  color: item.type === messageType.answer ? "#FFFFFF" : "#000000",
-                  padding: "10px 15px",
-                  borderRadius: "4px",
-                }}
-              >
-                {item.type === messageType.answer ? (
-                  <TypeWriter
-                    onInit={(writer) => {
-                      writer
-                        .typeString(item.content)
-                        .callFunction(() => {
-                          document.querySelector(
-                            ".Typewriter__cursor"
-                          ).style.display = "none";
-                          setOnRequest(false);
-                          setTimeout(() => {
-                            inputRef.current.focus();
-                          }, 200);
-                        })
-                        .changeDelay(50)
-                        .start();
-                    }}
-                  />
-                ) : (
-                  item.content
-                )}
-              </Box>
-            </Box>
-          ))}
-        </Stack>
-      </Box>
-      <Stack
-        direction="row"
-        alignItems="center"
-        paddingX="20px"
-        paddingBottom="20px"
-        position="sticky"
-        bottom="0"
-        backgroundColor="#FFFFFF"
-        zIndex={1}
-        sx={{ boxShadow: "0px -4px 4px rgba(0, 0, 0, 0.05)" }}
-      >
-        <FormControl fullWidth variant="outlined">
-          <OutlinedInput
-            inputRef={inputRef}
-            id="question-input"
+        {message.role !== "user" && role}
+        <Box sx={{ width: "fit-content" }}>
+          <Box
             sx={{
-              "& .MuiOutlinedInput-notchedOutline": {
-                border: "none",
-              },
+              p: 1,
+              borderRadius: 4,
+              backgroundColor: message.role !== "user" ? "#4472C4" : "#ED7D31",
+              color: "#fff",
+              fontSize: 16,
             }}
-            endAdornment={
-              onRequest ? (
-                <CircularProgress size="1.5rem" />
-              ) : (
-                <IconButton onClick={getAnswer} disabled={!question}>
-                  <SendOutlinedIcon />
-                </IconButton>
-              )
-            }
-            autoFocus
-            disabled={onRequest}
-            onKeyUp={onEnterPress}
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            placeholder="Ask something..."
-          />
-        </FormControl>
+          >
+            {message.content}
+          </Box>
+          {message.role !== "user" && (
+            <Box display="flex" justifyContent="flex-end">
+              <Button
+                startIcon={<ContentCopyIcon />}
+                color="neutral"
+                onClick={() => handleCopyMessage(message.content)}
+                size="small"
+              >
+                COPY ANSWER
+              </Button>
+            </Box>
+          )}
+        </Box>
+
+        {message.role === "user" && role}
       </Stack>
     </div>
   );
