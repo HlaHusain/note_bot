@@ -43,4 +43,4 @@ See the Video Tutorial: <br />
 * Install the dependencies ``npm install``
 * Start the local server ``npm start``
 
-*That will open the project on your default browser: http://127.0.0.1:3001/. You can now create your own notes with the AI assistance from your browser*
+*That will open the project on your default browser: http://localhost:3001/. You can now create your own notes with the AI assistance from your browser*
