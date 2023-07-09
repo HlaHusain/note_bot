@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Unstable_Grid2";
 import {
+  Alert,
   Button,
   CircularProgress,
   Container,
@@ -60,6 +61,7 @@ export const LoginForm = () => {
 
       doRedirect(true);
     } catch (error) {
+      setLoading(false);
       setResponse(error.data);
     }
   };
@@ -115,6 +117,10 @@ export const LoginForm = () => {
             }}
           >
             <Stack spacing={3} margin={2}>
+              {!!response?.message && (
+                <Alert severity="error">{response.message}</Alert>
+              )}
+
               <TextField
                 // required
                 type="email"

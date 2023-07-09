@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Style } from "@mui/icons-material";
+import Alert from "@mui/material/Alert";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
@@ -65,6 +65,7 @@ export const SignupForm = () => {
       setResponse(res);
       doRedirect(true);
     } catch (error) {
+      setLoading(false);
       setResponse(error.data);
     }
   };
@@ -117,6 +118,9 @@ export const SignupForm = () => {
           }}
         >
           <Stack spacing={3} margin={2}>
+            {!!response?.message && (
+              <Alert severity="error">{response.message}</Alert>
+            )}
             <TextField
               required
               label="User Name"
