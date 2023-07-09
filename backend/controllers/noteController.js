@@ -11,12 +11,8 @@ const HttpError = require("../model/http-error");
 const getNoteByNoteId = async (req, res, next) => {
   const { user_id, note_id } = req.params;
 
-  console.log(note_id, "note_id");
-
   try {
     const note = await noteModel.findById(note_id);
-
-    console.log("notes = ", note);
 
     if (!note) {
       return res
@@ -26,7 +22,6 @@ const getNoteByNoteId = async (req, res, next) => {
 
     for (const section_id of note.sections) {
       const section = await sectionModel.findById(section_id);
-      console.log("SECTION", section);
 
       if (section) {
         for (let widget_ids of section) {
@@ -90,7 +85,10 @@ const getNoteByUserId = async (req, res, next) => {
 
     for (let note of user.notes) {
       const courseId = note.course_id._id.toString();
+
+      // if(courseId){
       const course = await courseModel.findById(courseId);
+      // }
 
       if (!groupedNotes[courseId]) {
         groupedNotes[courseId] = {
@@ -178,7 +176,7 @@ const getNotesByCourseTitle = async (req, res, next) => {
 //       sess.startTransaction();
 //       const createdNote = new noteModel({
 //         title,
-//         notes: noteIds, 
+//         notes: noteIds,
 //       });
 //       await createdNote.save({ session: sess }); //add the note to the database
 //       user.notes.push(createdNote); //push the note to the user
@@ -203,8 +201,8 @@ const getNotesByCourseTitle = async (req, res, next) => {
 //   }
 // };
 const createNoteWithEmptySections = async (req, res, next) => {
- const { user_id, title, isPublic, course_id } = req.body;
-  
+  const { user_id, title, isPublic, course_id } = req.body;
+
   try {
     // Input validation and error handling...
 
@@ -215,7 +213,7 @@ const createNoteWithEmptySections = async (req, res, next) => {
       course_id,
       sections: [],
     });
-    
+
     await createdNote.save();
 
     res.status(201).json({ message: "Note created!", note: createdNote });
@@ -235,8 +233,8 @@ const pushSectionsToNote = async (req, res, next) => {
   try {
     // Input validation and error handling...
     const note = await noteModel.findById(note_id);
-    
-     if (!note) {
+
+    if (!note) {
       return res.status(404).json({ message: "Note not found." });
     }
 
@@ -244,7 +242,7 @@ const pushSectionsToNote = async (req, res, next) => {
     await note.save();
 
     res.status(200).json({ message: "Sections added to note.", note });
-     } catch (err) {
+  } catch (err) {
     console.log(err);
     const error = new HttpError(
       "Adding sections to note failed, please try again later.",
@@ -253,10 +251,8 @@ const pushSectionsToNote = async (req, res, next) => {
     return next(error);
   }
 };
-    
-    
-const createNote = async (req, res, next) => {
 
+const createNote = async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   const user_id = req.userData.userId;
@@ -269,9 +265,10 @@ const createNote = async (req, res, next) => {
       return res.status(400).json({ message: "Missing required fields." });
     }
 
-
-    const note = await noteModel.findById(note_id);
-
+    const [user, course] = await Promise.all([
+      userModel.findById(user_id),
+      courseModel.findById(course_id),
+    ]);
 
     if (!user.notes) {
       user.notes = [];
@@ -303,8 +300,6 @@ const createNote = async (req, res, next) => {
         note_id: createdNote._id,
       });
       await sectionObject.save({ session });
-
-      console.log("sectionObject === ", sectionObject._id);
 
       createdNote.sections.push(sectionObject._id);
       await createdNote.save({ session });
@@ -351,7 +346,6 @@ const createNote = async (req, res, next) => {
   }
 };
 
-
 //update note
 // const updateNote = async (req, res, next) => {
 //   const { title, isPublic, course_id } = req.body;
@@ -391,26 +385,7 @@ const deleteNote = async (req, res, next) => {
   const note_id = req.params.note_id;
 
   try {
-    const user = await userModel.findById(user_id);
-    const course = await courseModel.findById(course_id);
-
-    if (!user) {
-      return res
-        .status(404)
-        .json({ message: "Could not find user for the provided id." });
-    }
-
-    if (!course) {
-      return res
-        .status(404)
-        .json({ message: "Could not find course for the provided id." });
-    }
-
-    const note = await noteModel.findOneAndDelete({
-      _id: note_id,
-      user_id: user._id,
-      course_id: course._id,
-    });
+    const note = await noteModel.findById(note_id);
 
     if (!note) {
       return res
@@ -418,14 +393,46 @@ const deleteNote = async (req, res, next) => {
         .json({ message: "Could not find note for the provided id." });
     }
 
-    // Remove the note reference from user and course
+    if (note.user_id.toString() !== req.userData.userId) {
+      return res
+        .status(401)
+        .json({ message: "You don't have permissions to delete this note." });
+    }
+
+    const user = await userModel.findById(note.user_id);
+    const course = await courseModel.findById(note.course_id);
+
+    await noteModel.deleteOne({
+      _id: note_id,
+    });
+
+    const widgets = await widgetModel.find({
+      section_id: { $in: note.sections },
+    });
+
+    const widgetIds = widgets.map((widget) => widget._id);
+
     user.notes.pull(note._id);
     course.notes.pull(note._id);
 
-    await Promise.all([user.save(), course.save()]);
+    await Promise.all([
+      user.save(),
+      course.save(),
+      sectionModel.deleteMany({
+        _id: {
+          $in: note.sections,
+        },
+      }),
+      widgetModel.deleteMany({
+        _id: {
+          $in: widgetIds,
+        },
+      }),
+    ]);
 
     res.json({ message: "Note deleted!", note });
   } catch (err) {
+    console.log(err);
     const error = new HttpError(
       "Deleting note failed, please try again later.",
       500
@@ -519,7 +526,6 @@ const getNotes = async (req, res, next) => {
   }
 };
 
-
 const getNoteByNoteID = async (req, res, next) => {
   const { note_id } = req.params;
 
@@ -536,13 +542,12 @@ const getNoteByNoteID = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       "An error occurred while fetching the note.",
-            500
+      500
     );
     return next(error);
   }
 };
 
-  
 const getNoteWidgets = async (req, res, next) => {
   try {
     const note = await noteModel.findById(req.params.note_id);

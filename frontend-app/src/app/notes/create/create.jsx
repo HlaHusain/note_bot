@@ -1,13 +1,21 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Unstable_Grid2";
-import { Button, Container, Divider, Stack } from "@mui/material";
+import {
+  Avatar,
+  Button,
+  Container,
+  Divider,
+  Fab,
+  Stack,
+  styled,
+  useTheme,
+} from "@mui/material";
 import { PageHeader } from "../../../components/PageHeader";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import SaveIcon from "@mui/icons-material/Save";
 import AddIcon from "@mui/icons-material/Add";
 import { useEffect } from "react";
-
 import { useState } from "react";
 
 import { useAuth } from "../../../contexts/AuthProvider";
@@ -17,6 +25,9 @@ import { Section } from "./Section";
 import { createNote, getCourses } from "./api";
 import { useNavigate } from "react-router-dom";
 import { useNoteWidgets } from "../hooks/useNoteWidgets";
+import {Chatbot} from "./../../chatbot"
+
+
 export const CreateNote = () => {
   const {
     sections,
@@ -27,14 +38,35 @@ export const CreateNote = () => {
     hasWidgets,
     addSection,
   } = useNoteWidgets();
+  const theme = useTheme();
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  const handleChangeIndex = (index) => {
+    setValue(index);
+  };
+
+  const transitionDuration = {
+    enter: theme.transitions.duration.enteringScreen,
+    exit: theme.transitions.duration.leavingScreen,
+  };
 
   const { token, user, saveUser, logout, isAuthorized } = useAuth();
 
   const [title, setTitle] = React.useState("");
   const [course, setCourse] = useState("");
   const [courses, setCourses] = useState([]);
+  const [open, setOpen] = useState(false);
 
   const navigate = useNavigate();
+
+  const toggleChat = () => {
+    setOpen(!open);
+    console.log("openChat", open);
+  };
 
   const {
     isActive: isAddCourseActive,
@@ -167,6 +199,25 @@ export const CreateNote = () => {
         course={course}
         onChange={(course) => setCourse(course)}
       />
+
+      {open && <Chatbot />}
+
+      <Fab
+        sx={{
+          position: "fixed",
+          right: 24,
+          bottom: 24,
+        }}
+        size="medium"
+        aria-label={"label"}
+        color={""}
+      >
+        <Avatar
+          sx={{ width: 60, height: 60 }}
+          src={"/chatBot.png"}
+          onClick={toggleChat}
+        />
+      </Fab>
     </Container>
   );
 };

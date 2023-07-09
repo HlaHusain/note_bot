@@ -13,3 +13,13 @@ export const getWidgets = async (token, noteId) => {
 
   return note;
 };
+
+export const deleteNote = async (noteId, token) => {
+   await fetch(`${url}/notes/${noteId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-type": "application/json",
+      Authorization: token,
+    },
+  });
+};

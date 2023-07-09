@@ -9,6 +9,7 @@ const { json } = require("body-parser");
 const getAllCourses = async (req, res, next) => {
   try {
     const courses = await courseModel.find();
+
     res.json({
       courses: courses.map((course) => course.toObject({ getters: true })),
     });
@@ -22,7 +23,7 @@ const getAllCourses = async (req, res, next) => {
 };
 
 //Get courses by user_id
-const getCoursesByUserId = async (req, res, next) =>{
+const getCoursesByUserId = async (req, res, next) => {
   const user_id = req.userData.userId;
 
   try {
@@ -34,8 +35,24 @@ const getCoursesByUserId = async (req, res, next) =>{
         .json({ message: "Could not find user for the provided user id." });
     }
 
+    const courses = user.courses.map((course) =>
+      course.toObject({ getters: true })
+    );
+
+    await Promise.all(
+      courses.map((course) => {
+        return noteModel
+          .find({
+            course_id: course._id,
+          })
+          .then((list) => {
+            course.notes_count = list.length;
+          });
+      })
+    );
+
     res.json({
-      courses: user.courses.map((course) => course.toObject({ getters: true })),
+      courses,
     });
   } catch (err) {
     const error = new HttpError(
@@ -48,8 +65,9 @@ const getCoursesByUserId = async (req, res, next) =>{
 
 //Create a new course
 const createCourse = async (req, res, next) => {
-  const {  title } = req.body;
+  const { title } = req.body;
   const user_id = req.userData.userId;
+
   let session; // Declare the session variable
 
   try {
@@ -58,8 +76,10 @@ const createCourse = async (req, res, next) => {
     session.startTransaction();
 
     // Create the course
-    const createdCourse = await courseModel.create([{ user_id, title }], { session });
-
+    const createdCourse = await courseModel.create([{ user_id, title }], {
+      session,
+    });
+    console.log("createdCourse", createdCourse);
     // Assign the course to the user
     await userModel.findByIdAndUpdate(
       user_id,
@@ -93,13 +113,17 @@ const createCourse = async (req, res, next) => {
 //delete course and its notes
 const deleteCourseWithNotes = async (req, res, next) => {
   const { course_id } = req.params;
-  
+
+  console.log("course_id", course_id);
+
   try {
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
       const course = await courseModel.findById(course_id);
+
+      console.log("course", course);
 
       if (!course) {
         return res
@@ -112,7 +136,9 @@ const deleteCourseWithNotes = async (req, res, next) => {
       // Delete the course and its associated notes
       await Promise.all([
         courseModel.findByIdAndDelete(course_id, { session }), // Delete the course
-        noteModel.deleteMany({ _id: { $in: noteIds } }, { session }), // Delete the associated notes
+        noteIds.length > 0
+          ? noteModel.deleteMany({ _id: { $in: noteIds } }, { session }) // Delete the associated notes
+          : Promise.resolve(), // Resolve immediately if noteIds is empty
       ]);
 
       await session.commitTransaction();
@@ -137,9 +163,7 @@ const deleteCourseWithNotes = async (req, res, next) => {
   }
 };
 
-
 exports.getAllCourses = getAllCourses;
 exports.getCoursesByUserId = getCoursesByUserId;
 exports.deleteCourseWithNotes = deleteCourseWithNotes;
 exports.createCourse = createCourse;
-

@@ -143,7 +143,7 @@ const login = async (req, res, next) => {
     token = jwt.sign(
       { userId: existingUser.id, email: existingUser.email },
       "dont share",
-      { expiresIn: "1h" }
+      { expiresIn: "1w" }
     );
     console.log("token", token);
   } catch (err) {

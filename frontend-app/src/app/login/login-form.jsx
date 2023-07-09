@@ -3,7 +3,13 @@ import { Label, Style } from "@mui/icons-material";
 import { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Unstable_Grid2";
-import { Button, Container, Stack, TextField } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  Container,
+  Stack,
+  TextField,
+} from "@mui/material";
 import { Image } from "../../components/Image";
 import { Link, useNavigate } from "react-router-dom";
 import { login as loginApi } from "./api";
@@ -50,7 +56,7 @@ export const LoginForm = () => {
       setLoading(true);
       const res = await loginApi(data.email, data.password);
 
-      saveUser(res); 
+      saveUser(res);
 
       doRedirect(true);
     } catch (error) {
@@ -149,20 +155,13 @@ export const LoginForm = () => {
                 type="submit"
                 disabled={loading}
                 size="large"
-                variant="outlined"
+                variant="contained"
                 fullWidth
+                startIcon={
+                  loading && <CircularProgress color="inherit" size={16} />
+                }
                 sx={{
-                  background: "#ED7D31",
-                  borderRadius: 2,
-                  color: "#FFFFFF",
-                  alignItems: "left",
                   padding: 1.5,
-                  border: "0",
-                  "&:hover": {
-                    color: "#fff",
-                    background: "#fed3cd",
-                    border: "0",
-                  },
                 }}
               >
                 Login
@@ -182,17 +181,25 @@ export const LoginForm = () => {
                   {response["error"]}
                 </Box>
               )} */}
-              <Box   sx={{
-                    color: "#6FADE6",
-                    // border: "solid 1px #fecaca",
-                    marginBottom: 2,
-                    fontSize: 14,
-                    display:'flex',
-                    justifyContent: "center",
-                    padding:1,
-                  }}>
-              <Box>Dont have account ? </Box>
-              <Link to='/signup' sx={{color: "#6FADE6",textDecoration: "none",}}> Signup</Link>
+              <Box
+                sx={{
+                  color: "#6FADE6",
+                  // border: "solid 1px #fecaca",
+                  marginBottom: 2,
+                  fontSize: 14,
+                  display: "flex",
+                  justifyContent: "center",
+                  padding: 1,
+                }}
+              >
+                <Box>Dont have account ? </Box>
+                <Link
+                  to="/signup"
+                  sx={{ color: "#6FADE6", textDecoration: "none" }}
+                >
+                  {" "}
+                  Signup
+                </Link>
               </Box>
             </Stack>
           </Grid>

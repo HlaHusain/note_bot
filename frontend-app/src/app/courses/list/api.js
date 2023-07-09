@@ -17,7 +17,6 @@ export const getCoursesByUserId = async (user_id) => {
     const response = await axiosClient.get(`/courses/user/${user_id}`);
     const courses = response.data.courses;
 
-    console.log('courses = ',courses)
     // Add the id property to each course object
     const coursesWithId = courses.map((course) => ({
       id: course._id,

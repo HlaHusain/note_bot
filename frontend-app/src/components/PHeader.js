@@ -26,7 +26,7 @@ export const PHeader = ({ title, actions = [] }) => {
         }}
       >
         <Stack spacing={1} direction="row" alignItems="flex-end">
-          <Typography variant="h2" component="h1" sx={{ fontSize: 28, fontFamily: "Poppins, sans-serif", fontWeight: 400 }}>
+          <Typography variant="h2" component="h1" sx={{ fontSize: 24, fontFamily: "Poppins, sans-serif", fontWeight: 400 }}>
             {pageTitle}
           </Typography>
         </Stack>

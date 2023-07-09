@@ -9,30 +9,35 @@ import {
   TableRow,
   IconButton,
   Paper,
+  Container,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { PHeader } from "../../../components/PHeader";
+import { PageHeader } from "../../../components/PageHeader";
 import { MenuComponent } from "../../../components/Menu";
 import { CreateCourseDialog } from "../create/create";
-import { getCourses, getCoursesByUserId } from "./api";
-import { deleteCourseWithNotes } from "./course.api";
+// import { getCourses, getCoursesByUserId } from "./api";
+import { deleteCourseWithNotes , getCoursesByUserId } from "./course.api";
+import { useAuth } from "../../../contexts/AuthProvider";
 
 //import { getAllCourses, getCoursesByUserId, createCourse, deleteCourseWithNotes } from "./course.api";
 
 export const CoursesList = () => {
+  const [refresh, setRefresh] = useState(false);
   const [courses, setCourses] = useState([]);
   const [open, setOpen] = useState(false);
-
+  const { token, user} = useAuth();
 
   // const { user_id } = useParams();
   // console.log(user_id);
 
-  const user_id = "649b6f816615c87ac498d9e9";
+  console.log('courses ======'  , courses)
+
 
   useEffect(() => {
+
     const fetchCourses = async () => {
       try {
-        const fetchedCourses = await getCoursesByUserId(user_id);
+        const fetchedCourses = await getCoursesByUserId(user,token);
         setCourses(fetchedCourses);
       } catch (error) {
         console.error(error);
@@ -40,21 +45,12 @@ export const CoursesList = () => {
     };
 
     fetchCourses();
-  }, []);
 
-  // useEffect(() => {
-  //   const fetchCourses = async () => {
-  //     try {
-  //       const fetchedCourses = await getCourses();
-  //       console.log('fetch: ',fetchedCourses);
-  //       setCourses(fetchedCourses);
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
+    console.log('refresh' , refresh)
 
-  //   fetchCourses();
-  // }, []);
+        // setRefresh(false);
+  }, [refresh]);
+
 
   const handleOpen = () => {
     setOpen(true);
@@ -67,10 +63,11 @@ export const CoursesList = () => {
 // Handle course deletion
 const handleDeleteCourse = async (courseId) => {
   try {
-    await deleteCourseWithNotes(courseId);
+    await deleteCourseWithNotes(courseId,token);
     setCourses((prevCourses) =>
       prevCourses.filter((course) => course.id !== courseId)
     );
+    setRefresh(true)
   } catch (error) {
     console.error(error);
   }
@@ -78,9 +75,8 @@ const handleDeleteCourse = async (courseId) => {
 
 
   return (
-    <div>
-      <MenuComponent />
-      <PHeader
+    <Container maxWidth="md" sx={{ marginTop: 5 }}>
+      <PageHeader
       title="My Courses"
       actions={[
         {
@@ -97,7 +93,7 @@ const handleDeleteCourse = async (courseId) => {
         isOpen={open}
         onClose={handleClose}
         courses={courses}
-        user_id={user_id}
+        user_id={user}
         setCourses={setCourses}
       />
     )}
@@ -105,7 +101,7 @@ const handleDeleteCourse = async (courseId) => {
       <TableContainer
         component={Paper}
         sx={{
-          margin: "20px auto",
+          // margin: "20px auto",
           border: "1px solid #ccc",
           borderRadius: "8px",
           width: "100%",
@@ -118,7 +114,7 @@ const handleDeleteCourse = async (courseId) => {
               <TableCell
                 sx={{
                   fontWeight: "bold",
-                  fontSize: "22px",
+                  // fontSize: "22px",
                   textAlign: "center",
                 }}
               >
@@ -127,7 +123,7 @@ const handleDeleteCourse = async (courseId) => {
               <TableCell
                 sx={{
                   fontWeight: "bold",
-                  fontSize: "22px",
+                  // fontSize: "22px",
                   textAlign: "center",
                 }}
               >
@@ -136,7 +132,7 @@ const handleDeleteCourse = async (courseId) => {
               <TableCell
                 sx={{
                   fontWeight: "bold",
-                  fontSize: "22px",
+                  // fontSize: "22px",
                   textAlign: "center",
                 }}
               >
@@ -147,35 +143,34 @@ const handleDeleteCourse = async (courseId) => {
           <TableBody>
             {courses.map((course) => (
               <TableRow
-                key={course.id}
+                key={course._id}
                 sx={{ "&:hover": { backgroundColor: "#f5f5f5" } }}
               >
                 <TableCell
                   sx={{
-                    fontSize: "22px",
-                    fontFamily: "Poppins",
+                    // fontSize: "22px",
                     color: "#ED7D31",
                     textAlign: "center",
                     verticalAlign: "middle",
                   }}
                 >
                   {course.title}
+
                 </TableCell>
                 <TableCell
                   sx={{
-                    fontSize: "22px",
-                    fontFamily: "Poppins",
+                    // fontSize: "22px",
                     color: "#ED7D31",
                     textAlign: "center",
                     verticalAlign: "middle",
                   }}
                 >
-                  {course.notes.length}
+                  {course.notes_count}
                 </TableCell>
                 <TableCell
                   sx={{ textAlign: "center", verticalAlign: "middle" }}
                 >
-                  <IconButton onClick={() => handleDeleteCourse(course.id)}>
+                  <IconButton onClick={() => handleDeleteCourse(course._id)}>
                     <DeleteIcon style={{ color: "#ED7D31" }} />
                   </IconButton>
                 </TableCell>
@@ -184,6 +179,6 @@ const handleDeleteCourse = async (courseId) => {
           </TableBody>
         </Table>
       </TableContainer>
-    </div>
+    </Container>
   );
 };

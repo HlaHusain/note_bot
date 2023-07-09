@@ -38,14 +38,14 @@ const noteSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'users'
   }],
-  rated_by: [{
-    type: mongoose.Types.ObjectId,
-    ref: 'users'
-  }],
-  stars_sum: {
-    type: Number,
-    required: false,
-  },
+  // rated_by: [{
+  //   type: mongoose.Types.ObjectId,
+  //   ref: 'users'
+  // }],
+  // stars_sum: {
+  //   type: Number,
+  //   required: false,
+  // },
 });
 
 const noteModel = mongoose.model(collectionName_notes, noteSchema);
