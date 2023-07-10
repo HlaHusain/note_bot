@@ -1,7 +1,7 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-router.post('/', async (req, res, next) => {
+router.post("/", async (req, res, next) => {
   try {
     const { message } = req.body;
 
@@ -9,10 +9,9 @@ router.post('/', async (req, res, next) => {
 
     // Create an array to hold both user and ChatGPT messages
     const messages = [
-      { role: 'user', content: message }, // User message
-      { role: 'assistant', content: '' }, // ChatGPT message (initially empty)
+      { role: "user", content: message }, // User message
+      { role: "assistant", content: "" }, // ChatGPT message (initially empty)
     ];
-
 
     try {
       const { Configuration, OpenAIApi } = require("openai");
@@ -24,30 +23,65 @@ router.post('/', async (req, res, next) => {
 
       console.log("Sending message to ChatGPT");
 
-      const completion = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        messages: messages, // Pass the messages array
-        temperature: 0.2,
+      const close = () => {
+        res.end();
+      };
+
+      res.writeHead(200, {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+        "Content-Encoding": "none",
       });
 
-      const text = completion.data.choices[0].message.content;
+      const completion = await openai.createChatCompletion(
+        {
+          model: "gpt-3.5-turbo",
+          messages: messages, // Pass the messages array
+          temperature: 0.2,
+          stream: true,
+        },
+        {
+          responseType: "stream",
+        }
+      );
 
-      // Update the ChatGPT message in the messages array
-      messages[1].content = text;
+      completion.data.on("data", (data) => {
+        const lines = data
+          .toString()
+          .split("\n")
+          .filter((line) => line.trim() !== "");
 
-      console.log(`Sending response to client: ${text}`);
+        for (const line of lines) {
+          const message = line.replace(/^data: /, "");
+          if (message === "[DONE]") {
+            res.end();
+          }
 
-      console.log('Received message: ' + message);
+          try {
+            const parsed = JSON.parse(message);
+            const content = parsed.choices[0].delta.content;
 
-      // Return the response to the frontend
-      res.json({ response: text });
+            if (!content) {
+              continue;
+            }
+            res.write(`data: ${content}`);
+          } catch (error) {
+            // console.error('Could not JSON parse stream message', message, error)
+          }
+        }
+      });
+
+      completion.data.on("close", close);
+
+      res.on("close", close);
     } catch (error) {
-      console.error('Error in ChatGPT route:', error);
+      console.error("Error in ChatGPT route:", error);
       //res.status(500).json({ 'Something went wrong' })
       return next(error);
     }
   } catch (error) {
-    console.error('Error in request:', error);
+    console.error("Error in request:", error);
     //res.status(500).json({ 'Something went wrong' });
     return next(error);
   }
