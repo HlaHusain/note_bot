@@ -59,13 +59,28 @@ export const Chatbot = () => {
     setIsBotReply(false);
 
     try {
-      const res = await chatCompletion(message, token);
-
-      // Add ChatGPT's response to the chat
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { role: "bot", content: res.response },
-      ]);
+      let started = false;
+      await chatCompletion(message, token, (content) => {
+        if (!started) {
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            { role: "bot", content },
+          ]);
+        } else {
+          
+          setMessages((prevMessages) =>
+            prevMessages.map((message, index) =>
+              index !== prevMessages.length - 1
+                ? message
+                : {
+                    ...message,
+                    content,
+                  }
+            )
+          );
+        }
+        started = true
+      });
 
       setIsBotReply(true);
       setBotResponsesCount((prevCount) => prevCount + 1);
