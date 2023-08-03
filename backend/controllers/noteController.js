@@ -552,6 +552,27 @@ const getNoteWidgets = async (req, res, next) => {
   try {
     const note = await noteModel.findById(req.params.note_id);
     const sections = await sectionModel.find({ _id: { $in: note.sections } });
+
+    const indexDictionary = note.sections.reduce(
+      (acc, id, index) => ({
+        ...acc,
+        [id]: index,
+      }),
+      {}
+    );
+
+    sections.sort((a, b) => {
+      const aIndex = indexDictionary[a._id];
+      const bIndex = indexDictionary[b._id];
+      if (aIndex < bIndex) {
+        return -1;
+      }
+      if (aIndex > bIndex) {
+        return 1;
+      }
+
+      return 0;
+    });
     const widgets = await widgetModel.find({
       section_id: { $in: note.sections },
     });
@@ -586,6 +607,7 @@ const updateNote = async (req, res, next) => {
     note.course_id = course;
 
     await note.save({ session });
+    note.sections = [];
 
     for (const section of sections) {
       let sectionObject =
@@ -602,7 +624,6 @@ const updateNote = async (req, res, next) => {
 
       if (!note.sections.find((_id) => _id === sectionObject._id)) {
         note.sections.push(sectionObject._id);
-        await note.save({ session });
       }
 
       const sectionWidgets = widgets[section._id || section.id];
@@ -629,6 +650,8 @@ const updateNote = async (req, res, next) => {
         await sectionObject.save({ session });
       }
     }
+
+    await note.save({ session });
 
     await session.commitTransaction();
     await session.endSession();

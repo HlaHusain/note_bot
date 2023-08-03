@@ -17,6 +17,16 @@ export const getCourses = async (token, user) => {
   return data;
 };
 
+export const deleteSection=async (token,sectionId) =>{
+  const response = await fetch(`${url}/notes/`, {
+    method: "DELETE",
+    headers: { "Content-type": "application/json", Authorization: token },
+    body: JSON.stringify({
+      section_id: sectionId,
+    }),
+  });
+}
+
 export const createNote = async (
   token,
   title,

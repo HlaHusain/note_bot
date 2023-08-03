@@ -28,6 +28,9 @@ export const NoteEdit = ({}) => {
     addSection,
     hasWidgets,
     replaceWidgets,
+    onDelete,
+    onAddAfter,
+    onDuplicate,
   } = useNoteWidgets();
 
   const params = useParams();
@@ -175,6 +178,9 @@ export const NoteEdit = ({}) => {
             onWidgetUpdate={onWidgetUpdate}
             widgets={widgets[section.id] || {}}
             viewMode={false}
+            onDelete={onDelete}
+            onAddAfter={onAddAfter}
+            onDuplicate={onDuplicate}
           />
         </>
       ))}

@@ -25,8 +25,7 @@ import { Section } from "./Section";
 import { createNote, getCourses } from "./api";
 import { useNavigate } from "react-router-dom";
 import { useNoteWidgets } from "../hooks/useNoteWidgets";
-import {Chatbot} from "./../../chatbot"
-
+import { Chatbot } from "./../../chatbot";
 
 export const CreateNote = () => {
   const {
@@ -37,6 +36,9 @@ export const CreateNote = () => {
     onWidgetUpdate,
     hasWidgets,
     addSection,
+    onDelete,
+    onAddAfter,
+    onDuplicate,
   } = useNoteWidgets();
   const theme = useTheme();
   const [value, setValue] = React.useState(0);
@@ -151,6 +153,9 @@ export const CreateNote = () => {
             onWidgetUpdate={onWidgetUpdate}
             widgets={widgets[section.id] || {}}
             viewMode={false}
+            onDelete={onDelete}
+            onAddAfter={onAddAfter}
+            onDuplicate={onDuplicate}
           />
         </>
       ))}

@@ -37,7 +37,7 @@ export const CreateCourseDialog = ({ isOpen, onClose,courses , user_id, setCours
   };
   return (
     <Dialog onClose={onClose} open={isOpen} fullWidth>
-      <DialogTitle>Set Course to Note</DialogTitle>
+      <DialogTitle>Add New Course</DialogTitle>
       <DialogContent>
       <Box sx={{height:12}}/>
           
