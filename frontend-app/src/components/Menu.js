@@ -23,8 +23,8 @@ import { AvatarComponent } from "./UserAvatar";
 
 const pages = [
   { label: "notes", link: "/notes" },
-  { label: "courses", link: "/courses" },
-  { label: "saved notes", link: "/notes/saved" },
+  // { label: "courses", link: "/courses" },
+  { label: "Favorite notes", link: "/notes/saved" },
 ];
 
 export const MenuComponent = () => {

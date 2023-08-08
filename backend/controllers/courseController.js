@@ -114,16 +114,12 @@ const createCourse = async (req, res, next) => {
 const deleteCourseWithNotes = async (req, res, next) => {
   const { course_id } = req.params;
 
-  console.log("course_id", course_id);
-
   try {
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
       const course = await courseModel.findById(course_id);
-
-      console.log("course", course);
 
       if (!course) {
         return res
@@ -132,19 +128,18 @@ const deleteCourseWithNotes = async (req, res, next) => {
       }
 
       const noteIds = course.notes;
-
+      console.log(noteIds);
       // Delete the course and its associated notes
       await Promise.all([
-        courseModel.findByIdAndDelete(course_id, { session }), // Delete the course
-        noteIds.length > 0
-          ? noteModel.deleteMany({ _id: { $in: noteIds } }, { session }) // Delete the associated notes
-          : Promise.resolve(), // Resolve immediately if noteIds is empty
+        courseModel.findByIdAndDelete(course_id, { session }),
+        noteModel.deleteMany({ course_id: course_id }, { session }),
       ]);
 
       await session.commitTransaction();
 
       res.status(200).json({ message: "Course and associated notes deleted." });
     } catch (error) {
+      console.log(error);
       await session.abortTransaction();
       const httpError = new HttpError(
         `An error occurred while deleting the course: ${error.message}`,

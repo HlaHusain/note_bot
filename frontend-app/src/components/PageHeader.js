@@ -7,6 +7,7 @@ import { Divider, TextField } from "@mui/material";
 import { Typography, Button } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 
+
 import Stack from "@mui/material/Stack";
 
 export const PageHeader = ({
@@ -15,6 +16,9 @@ export const PageHeader = ({
   actions = [],
   onChange,
   label,
+  variant,
+  InputProps,
+  size
 }) => {
   actions = actions || []
   const handleChange = (e) => {
@@ -25,17 +29,20 @@ export const PageHeader = ({
     <>
       <Grid container alignItems="center" justifyContent="space-between">
         <Stack spacing={1} direction="row" alignItems="flex-end">
+        
           <TextField
             value={title}
-            variant="standard"
-            InputProps={{
-              disableUnderline: true,
-            }}
+            InputProps={InputProps}
+            size={size}
+            // InputProps={{
+            //   disableUnderline: true,
+            // }}
+            variant={variant}
             disabled={!isEditable}
             onChange={handleChange}
             label={label}
           />
-          {!!isEditable && <EditIcon />}
+          {/* {!!isEditable && <EditIcon />} */}
         </Stack>
         <Stack spacing={1} direction="row">
           {actions.map(({ label,  ...action }) => (
@@ -51,7 +58,7 @@ export const PageHeader = ({
           ))}
         </Stack>
       </Grid>
-      <Divider component="div" role="presentation" sx={{ marginY: 2 }} />
+      <Divider component="div" role="presentation" sx={{ marginY: 1 }} />
     </>
   );
 };

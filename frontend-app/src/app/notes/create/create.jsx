@@ -67,7 +67,6 @@ export const CreateNote = () => {
 
   const toggleChat = () => {
     setOpen(!open);
-    console.log("openChat", open);
   };
 
   const {
@@ -76,45 +75,52 @@ export const CreateNote = () => {
     close: closeAddCourse,
   } = useToggle();
 
+  const fetchCourses = React.useCallback(async () => {
+    try {
+      const fetchedCourses = await getCourses(token, user);
+
+      const courses = fetchedCourses.courses.map((course) => ({
+        id: course._id,
+        ...course,
+      }));
+
+      setCourses(courses);
+    } catch (error) {
+      console.error(error);
+    }
+  }, [token, user]);
+
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const fetchedCourses = await getCourses(token, user);
-
-        const courses = fetchedCourses.courses.map((course) => ({
-          id: course._id,
-          ...course,
-        }));
-
-        setCourses(courses);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
     fetchCourses();
-  }, []);
+  }, [fetchCourses]);
 
-  const onSubmit = async () => {
+  const onSubmit = async (data = {}) => {
     if (!title) {
       alert("Title is empty");
       return;
     }
-    const res = await createNote(token, title, course, user, sections, widgets);
+    const res = await createNote(
+      token,
+      title,
+      data.courseId || course,
+      user,
+      sections,
+      widgets
+    );
 
     console.log("RES", res);
     navigate(`/notes/${res.note._id}`);
   };
 
-  const hasCourse = !!course;
-
   return (
     <Container sx={{ flexGrow: 1, padding: 6 }}>
       <PageHeader
-        title={title}
+        // title={title}
         label={"Add Note Title"}
         onChange={(title) => setTitle(title)}
         isEditable={true}
+        sx={{ width: "100%" }}
+        variant={"outlined"}
         actions={[
           {
             label: "download as pdf",
@@ -125,21 +131,19 @@ export const CreateNote = () => {
             disabled: true,
           },
           {
-            label: "Save NOTE",
-            startIcon: <SaveIcon />,
-            onClick: () => {
-              onSubmit();
-            },
-            disableElevation: true,
-            disabled: !hasCourse || !hasWidgets,
-          },
-          {
-            label: "Add to course",
+            label: "Save",
             startIcon: <SaveIcon />,
             onClick: openAddCourse,
             disableElevation: true,
             disabled: !hasWidgets,
           },
+          // {
+          //   label: "Add to course",
+          //   startIcon: <SaveIcon />,
+          //   onClick: openAddCourse,
+          //   disableElevation: true,
+          //   disabled: !hasWidgets,
+          // },
         ]}
       />
       {sections.map((section, index) => (
@@ -202,7 +206,11 @@ export const CreateNote = () => {
         isOpen={isAddCourseActive}
         courses={courses}
         course={course}
-        onChange={(course) => setCourse(course)}
+        onSave={onSubmit}
+        onChange={(course) => {
+          setCourse(course);
+          fetchCourses();
+        }}
       />
 
       {open && <Chatbot />}

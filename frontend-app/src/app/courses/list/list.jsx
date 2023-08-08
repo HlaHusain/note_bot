@@ -27,10 +27,7 @@ export const CoursesList = () => {
   const [open, setOpen] = useState(false);
   const { token, user } = useAuth();
 
-  // const { user_id } = useParams();
-  // console.log(user_id);
 
-  console.log("courses ======", courses);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -46,7 +43,7 @@ export const CoursesList = () => {
 
     console.log("refresh", refresh);
 
-    // setRefresh(false);
+    setRefresh(false);
   }, [refresh]);
 
   const handleOpen = () => {

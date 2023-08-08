@@ -22,7 +22,8 @@ export const updateNote = async (
     }),
   });
 
-  const res = response.json();
+  const res = await response.json();
+  console.log('res ===' , res)
   return res;
 };
 
