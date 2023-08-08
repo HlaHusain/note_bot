@@ -18,7 +18,7 @@ router.get('/users/:user_id/savednotes', noteController.getSavedNotesByUserId); 
 
 
 router.post('/users/:user_id/notes/:note_id/save', noteController.saveNote); // Clicking on the save button in the Search page
-
+router.post('/update_rating', noteController.updateRating);
 router.patch('/push_sections', noteController.pushSectionsToNote);
 
 router.get('/note/:note_id', noteController.getNoteByNoteID); // Clicking on a note in the Dashboard page

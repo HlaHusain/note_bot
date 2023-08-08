@@ -506,6 +506,7 @@ const getSavedNotesByUserId = async (req, res, next) => {
   }
 };
 
+
 //get all notes
 const getNotes = async (req, res, next) => {
   try {
@@ -563,6 +564,55 @@ const getNoteWidgets = async (req, res, next) => {
 };
 
 
+const updateRating = async (req, res, next) => {
+  const { noteId, userId, rating } = req.body;
+
+  try {
+    let updatedNote;
+
+    // Check if the user has rated before for this note
+    const existingRating = await noteModel.findOne({
+      _id: noteId,
+      "ratings.userId": userId,
+    });
+
+    if (existingRating) {
+      // Update the existing rating
+      updatedNote = await noteModel.findOneAndUpdate(
+        { _id: noteId, "ratings.userId": userId },
+        { $set: { "ratings.$.rating": rating } },
+        { new: true }
+      );
+    } else {
+      // Add a new rating if the user is rating for the first time
+      updatedNote = await noteModel.findOneAndUpdate(
+        { _id: noteId },
+        { $push: { ratings: { userId, rating } } },
+        { new: true }
+      );
+    }
+
+    if (!updatedNote) {
+      return res
+        .status(404)
+        .json({ message: "Could not find note or user rating." });
+    }
+
+    res.status(200).json({
+      message: "Note rating updated!",
+      note: updatedNote,
+    });
+  } catch (err) {
+    console.error("Error updating note rating:", err);
+    const error = new HttpError(
+      "Updating note rating failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+};
+
+
 exports.getNoteWidgets = getNoteWidgets;
 
 exports.getNotesByUserIdAndCourseId = getNotesByUserIdAndCourseId;
@@ -578,3 +628,4 @@ exports.getSavedNotesByUserId = getSavedNotesByUserId;
 exports.getNoteByNoteID = getNoteByNoteID;
 exports.createNoteWithEmptySections = createNote;
 exports.pushSectionsToNote = pushSectionsToNote;
+exports.updateRating = updateRating;

@@ -19,4 +19,33 @@ export const getNotesByCourseTitle = async (keyword) => {
       throw new Error("Failed to fetch notes by course title.");
     }
   };
+
+
+  export const updateNoteRating = async (noteId, userId, rating) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/notes/update_rating`, {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({ noteId, userId, rating }),
+      });
+  
+      const updatedRating = await response.json();
+  
+      if (!response.ok) {
+        let error = new Error("HTTP status code " + response.status);
+        error.data = updatedRating;
+        error.status = response.status;
+        error.message = response.message;
+        throw error;
+      }
+  
+      return updatedRating;
+    } catch (error) {
+      console.error("Error updating note rating:", error);
+      throw error;
+    }
+  };
+  
   
