@@ -21,7 +21,7 @@
 
 ## ✨ Features
 
-<img align="right" src="https://github.com/HlaHusain/note_bot/assets/72098393/46c32532-51a0-4327-ba42-03126ba7c80a" alt="App Icon" width="500">
+<img align="right" src="https://github.com/HlaHusain/note_bot/assets/72098393/46c32532-51a0-4327-ba42-03126ba7c80a" alt="App Icon" width="450">
 
 
 ✅  Note creation and organization​
