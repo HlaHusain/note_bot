@@ -24,17 +24,17 @@
 <img align="right" src="https://github.com/HlaHusain/note_bot/assets/72098393/46c32532-51a0-4327-ba42-03126ba7c80a" alt="App Icon" width="500">
 
 
-- ✅  Note creation and organization​
+✅  Note creation and organization​
 
-- ✅  Note editing, viewing and downloading​
+✅  Note editing, viewing and downloading​
 
-- ✅  Full note layout editor​
+✅  Full note layout editor​
 
-- ✅  AI-powered chatbot ​
+✅  AI-powered chatbot ​
 
-- ✅  Search and filtering capabilities​
+✅  Search and filtering capabilities​
 
-- ✅  User authentication and authorization
+✅  User authentication and authorization
 
 <br><br>
 
