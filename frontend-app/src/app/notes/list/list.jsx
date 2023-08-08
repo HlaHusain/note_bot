@@ -1,83 +1,157 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
-import Grid from "@mui/material/Unstable_Grid2";
+
 import AddIcon from "@mui/icons-material/Add";
-import { Avatar, CircularProgress, Divider, useTheme } from "@mui/material";
-import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import TitleIcon from "@mui/icons-material/Title";
+import { CircularProgress, Divider, useTheme } from "@mui/material";
+
 import { useState, useEffect } from "react";
 import { getNotes } from "./api";
 import { useAuth } from "../../../contexts/AuthProvider.js";
 
-import {
-  Container,
-  Typography,
-  Button,
-  Card,
-  CardHeader,
-  CardContent,
-  CardActions,
-  IconButton,
-  Rating,
-} from "@mui/material";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Tooltip from "@mui/material/Tooltip";
+import ClearIcon from "@mui/icons-material/Clear";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { Container, Typography, IconButton } from "@mui/material";
+
+import { NotesList as NotesListComponent } from "../../../components/NotestList";
+
 import { PageHeader } from "../../../components/PageHeader";
 import { useNavigate } from "react-router-dom";
 
+import { makeStyles } from "@mui/styles";
+import { deleteCourseWithNotes } from "../../courses/list/course.api";
+
+const useStyles = makeStyles({
+  underline: {
+    "& input": {
+      fontSize: "24px",
+    },
+    "&&&:before": {
+      borderBottom: "none",
+    },
+    "&&:after": {
+      borderBottom: "none",
+    },
+  },
+});
+
 export const NotesList = () => {
   const theme = useTheme();
+  const classes = useStyles();
 
-  const [showMore, setShowMore] = React.useState(false);
-  const handleShowMoreClick = () => {
-    setShowMore(true);
-  };
+  const [courses, setCourses] = useState([]);
+  const [refresh, setRefresh] = useState(false);
+
+  
+  
   const [notes, setNotes] = useState([]);
+  const [anchorElUser, setAnchorElUser] = React.useState(null);
   const { token, user } = useAuth();
-
+  const settings = ["Delete"];
   const navigate = useNavigate();
   useEffect(() => {
     let fetchNotesList = async () => {
-      setIsLoading(true)
+      setIsLoading(true);
       const notes = await getNotes(token, user);
       setNotes(notes);
-      setIsLoading(false)
+      setIsLoading(false);
     };
     fetchNotesList();
-  }, [token, user]);
+
+    setRefresh(false);
+  }, [token, user, refresh]);
 
   const [isLoading, setIsLoading] = useState(true);
+
+  const handleOpenMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorElUser(null);
+  };
+
+  const handleDeleteCourse = async (courseId) => {
+    try {
+      await deleteCourseWithNotes(courseId, token);
+      setCourses((prevCourses) =>
+        prevCourses.filter((course) => course.id !== courseId)
+      );
+      setRefresh(true);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const onFavorite = async (noteId) => {
+    setNotes((courses) =>
+      courses.map((course) => ({
+        ...course,
+        notes: course.notes.map((note) => {
+          if (note._id !== noteId) {
+            return note;
+          }
+
+          return {
+            ...note,
+            isFavorite: !note.isFavorite,
+          };
+        }),
+      }))
+    );
+  };
 
   return (
     <Container maxWidth="md" sx={{ marginTop: 5 }}>
       <PageHeader
         title="My Notes"
         isEditable={false}
+        variant={"standard"}
+        InputProps={{ classes }}
+        size="large"
         actions={[
           {
             label: "Add Note",
             startIcon: <AddIcon />,
             onClick: () => navigate("/notes/create"),
             color: "primary",
-            variant: "outlined",
           },
-          {
-            label: "Add Course",
-            startIcon: <AddIcon />,
-            onClick: () => navigate("/courses"),
-            disableElevation: true,
-          },
+          // {
+          //   label: "Add Course",
+          //   startIcon: <AddIcon />,
+          //   onClick: () => navigate("/courses"),
+          //   disableElevation: true,
+          // },
         ]}
       />
 
       {isLoading && (
-        <Box sx={{
-          display:"flex",
-          alignItems:"center",
-          justifyContent:"center",
-          p:4
-        }}>
-          <CircularProgress sx={{mr:2}} />
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            p: 4,
+          }}
+        >
+          <CircularProgress sx={{ mr: 2 }} />
           please wait while loading notes
+        </Box>
+      )}
+
+      {!isLoading && notes.length === 0 && (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            p: 4,
+          }}
+        >
+          You don't have any notes yet.
         </Box>
       )}
 
@@ -92,13 +166,68 @@ export const NotesList = () => {
                   justifyContent: "space-between",
                 }}
               >
-                <Typography
-                  variant="h6"
-                  sx={{ color: "#ED7D31", marginBottom: 0 }}
-                  gutterBottom
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
                 >
-                  {note.course_title}
-                </Typography>
+                  <Typography
+                    variant="h6"
+                    sx={{ color: "#ED7D31", marginBottom: 0 }}
+                    gutterBottom
+                  >
+                    {note.course_title}
+                  </Typography>
+                  <Typography
+                    sx={{ margin: 1, fontSize: "12px", color: "#969696" }}
+                    gutterBottom
+                  >
+                    ( {note.notes.length} )
+                  </Typography>
+                </Box>
+
+                <Tooltip title="Open settings">
+                  <IconButton onClick={handleOpenMenu}>
+                    <MoreVertIcon />
+                  </IconButton>
+                </Tooltip>
+
+                <Menu
+                  sx={{ mt: "45px" }}
+                  id="menu-appbar"
+                  anchorEl={anchorElUser}
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  open={Boolean(anchorElUser)}
+                  onClose={handleCloseMenu}
+                >
+                  {settings.map((setting) => (
+                    <MenuItem key={setting}>
+                      {setting === "Delete" && (
+                        <>
+                          <ClearIcon
+                            fontSize="12"
+                            onClick={() => handleDeleteCourse(note.course_id)}
+                            sx={{
+                              marginRight: 1,
+                              opacity: 0.7,
+                            }}
+                          />
+                          Delete this course
+                        </>
+                      )}
+                    </MenuItem>
+                  ))}
+                </Menu>
                 {
                   //Uncommented because the lack of implemnentation
                 }
@@ -118,81 +247,13 @@ export const NotesList = () => {
                     </Button>
                   )} */}
               </Box>
-              <Divider sx={{ marginTop: 0.5, marginBottom: 2 }} />
-              {note && (
-                <Grid container spacing={2}>
-                  {note.notes.map((note) => (
-                    <Grid item xs={12} sm={6} lg={4} key={note.id}>
-                      <Card
-                        onClick={() => navigate(`/notes/${note._id}`)}
-                        sx={{
-                          bgcolor: theme.palette.shadow.main,
-                          borderRadius: 2,
-                          cursor: "pointer",
-                          ":hover": {
-                            bgcolor: theme.palette.shadow.hover,
-                          },
-                          height: "100%",
-                        }}
-                      >
-                        <CardHeader
-                          action={
-                            <Box sx={{ display: "flex" }}>
-                              <Avatar
-                                sx={{
-                                  bgcolor: "#4472C4",
-                                  width: 25,
-                                  height: 25,
-                                  marginRight: 1,
-                                }}
-                              >
-                                <TitleIcon sx={{ fontSize: 15 }} />
-                              </Avatar>
-                              <Avatar
-                                sx={{
-                                  bgcolor: "#ED7D31",
-                                  width: 25,
-                                  height: 25,
-                                }}
-                              >
-                                <PictureAsPdfIcon sx={{ fontSize: 15 }} />
-                              </Avatar>
-                            </Box>
-                          }
-                        />
-                        <CardContent sx={{ padding: 4, color: "#4662A6" }}>
-                          <Typography
-                            variant="h5"
-                            fontSize={18}
-                            fontWeight={550}
-                            sx={{
-                              wordBreak: "break-word",
-                              textAlign: "center",
-                            }}
-                            gutterBottom
-                          >
-                            {note.title}
-                          </Typography>
-                        </CardContent>
-                        <CardActions disableSpacing>
-                          <Rating
-                            value={note.rating}
-                            readOnly
-                            sx={{
-                              color: "#323232", // Set the color of stars to black
-                            }}
-                          />
-                        </CardActions>
-                      </Card>
-                    </Grid>
-                  ))}
-                </Grid>
-              )}
+              <Divider sx={{ marginTop: 0.5, marginBottom: 1 }} />
+              <NotesListComponent notes={note.notes} onFavorite={onFavorite} />
             </div>
           ))}
         </Stack>
       )}
-      <Divider sx={{ marginTop: 4 }} />
+      <Divider sx={{ marginTop: 2 }} />
     </Container>
   );
 };

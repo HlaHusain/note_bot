@@ -17,6 +17,22 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import { makeStyles } from '@mui/styles';
+
+const useStyles = makeStyles({
+
+  underline: {
+   '& input':{
+    fontSize:'24px',
+   },
+    "&&&:before": {
+      borderBottom: "none",
+    },
+    "&&:after": {
+      borderBottom: "none",
+    },
+  }
+});
 
 export const NoteView = ({}) => {
   const params = useParams();
@@ -25,6 +41,8 @@ export const NoteView = ({}) => {
   const [sections, setSections] = React.useState([]);
   const [widgets, setWidgets] = React.useState({});
   const { token, user } = useAuth();
+
+  const classes = useStyles();
 
   useEffect(() => {
     getWidgets(token, params.id).then((res) => {
@@ -71,6 +89,8 @@ export const NoteView = ({}) => {
         title={note?.title}
         isEditable={false}
         disabled={!note}
+        variant={'standard'}
+        InputProps={{ classes }}
         actions={
           !!note &&
           note.user_id === user && [

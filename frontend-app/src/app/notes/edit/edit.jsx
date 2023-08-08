@@ -28,12 +28,15 @@ export const NoteEdit = ({}) => {
     addSection,
     hasWidgets,
     replaceWidgets,
+    onDelete,
+    onAddAfter,
+    onDuplicate,
   } = useNoteWidgets();
 
   const params = useParams();
 
   const [note, setNote] = React.useState(null);
-
+  const [title, setTitle] = React.useState("");
   const [open, setOpen] = React.useState(false);
   const [error, setError] = React.useState({});
 
@@ -66,22 +69,21 @@ export const NoteEdit = ({}) => {
     }
   }, [note]);
 
+  const fetchCourses = React.useCallback(async () => {
+    try {
+      const fetchedCourses = await getCourses(token, user);
+
+      const courses = fetchedCourses.courses.map((course) => ({
+        id: course._id,
+        ...course,
+      }));
+
+      setCourses(courses);
+    } catch (error) {
+      console.error(error);
+    }
+  }, [token, user]);
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const fetchedCourses = await getCourses(token, user);
-
-        const courses = fetchedCourses.courses.map((course) => ({
-          id: course._id,
-          ...course,
-        }));
-
-        setCourses(courses);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
     fetchCourses();
 
     getWidgets(token, params.id).then((res) => {
@@ -91,51 +93,58 @@ export const NoteEdit = ({}) => {
       }
       const widgets = {};
 
-      {
-        res.widgets &&
-          res.widgets.forEach((widget) => {
-            if (!widgets[widget.section_id]) {
-              widgets[widget.section_id] = {};
-            }
-            widgets[widget.section_id][widget.layout_index] = {
-              ...widget,
-              id: widget._id,
-              data: widget.data || {},
-            };
-          });
-      }
+      res.widgets &&
+        res.widgets.forEach((widget) => {
+          if (!widgets[widget.section_id]) {
+            widgets[widget.section_id] = {};
+          }
+          widgets[widget.section_id][widget.layout_index] = {
+            ...widget,
+            id: widget._id,
+            data: widget.data || {},
+          };
+        });
 
-      // });
-      {
-        res.note && setNote(res.note);
-      }
-      {
-        res.sections &&
-          replaceWidgets(
-            res.sections.map((section) => ({
-              ...section,
-              id: section._id,
-              layout_field: section.layout_field,
-            })),
-            widgets
-          );
-      }
+      res.note && setNote(res.note);
+      setTitle(res.note.title)
+
+      res.sections &&
+        replaceWidgets(
+          res.sections.map((section) => ({
+            ...section,
+            id: section._id,
+            layout_field: section.layout_field,
+          })),
+          widgets
+        );
     });
   }, [params.id, token]);
 
   const navigate = useNavigate();
 
   const onUpdate = async () => {
+    if (!title) {
+      alert("Title is empty");
+      return;
+    }
+
+
+    console.log(      'update === ',
+      title,
+      note._id,
+      )
     const res = await updateNote(
       token,
-      note?.title,
+      title,
       sections,
       widgets,
       note._id,
-      course
+      course,
+      
     );
     if (!res.ok) {
       handleClick();
+      navigate(`/notes/${res.note._id}`);
       setError(res.message);
     }
   };
@@ -143,24 +152,25 @@ export const NoteEdit = ({}) => {
   return (
     <Container sx={{ flexGrow: 1, padding: 4 }}>
       <PageHeader
-        title={note?.title}
-        isEditable={false}
+      title={title}
+        onChange={(title) => setTitle(title)}
+        isEditable={true}
         disabled={!note}
         actions={[
           {
             label: "Save",
-            onClick: () => {
-              console.log("widgets = ", widgets);
-              onUpdate();
-            },
-          },
-          {
-            label: "Add to course",
             startIcon: <SaveIcon />,
             onClick: openAddCourse,
             disableElevation: true,
             disabled: !hasWidgets,
           },
+          // {
+          //   label: "Add to course",
+          //   startIcon: <SaveIcon />,
+          //   onClick: openAddCourse,
+          //   disableElevation: true,
+          //   disabled: !hasWidgets,
+          // },
         ]}
       />
 
@@ -175,6 +185,9 @@ export const NoteEdit = ({}) => {
             onWidgetUpdate={onWidgetUpdate}
             widgets={widgets[section.id] || {}}
             viewMode={false}
+            onDelete={onDelete}
+            onAddAfter={onAddAfter}
+            onDuplicate={onDuplicate}
           />
         </>
       ))}
@@ -222,7 +235,11 @@ export const NoteEdit = ({}) => {
           isOpen={isAddCourseActive}
           courses={courses}
           course={course}
-          onChange={(course) => setCourse(course)}
+          onSave={onUpdate}
+          onChange={(course) => {
+            setCourse(course);
+            fetchCourses();
+          }}
         />
       )}
 

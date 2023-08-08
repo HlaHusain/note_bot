@@ -5,6 +5,8 @@ const courseModel = require("../model/courseModel");
 const widgetModel = require("../model/widgetModel");
 const mongoose = require("mongoose");
 const HttpError = require("../model/http-error");
+const favoriteModel = require("../model/favoriteModel");
+
 //const { validationResult } = require('express-validator');
 
 // Get user notes by user_id
@@ -83,12 +85,32 @@ const getNoteByUserId = async (req, res, next) => {
     // Group notes by course ID
     const groupedNotes = {};
 
+    let favorites = await favoriteModel.find({
+      user_id: user_id,
+      note_id: { $in: user.notes },
+    });
+
+    favorites = favorites.reduce((acc, fav) => {
+      return {
+        ...acc,
+        [fav.note_id]: true,
+      };
+    }, {});
+
     for (let note of user.notes) {
       const courseId = note.course_id._id.toString();
 
-      // if(courseId){
-      const course = await courseModel.findById(courseId);
-      // }
+      let course;
+      if (courseId) {
+        course = await courseModel.findById(courseId);
+      }
+
+      if (!course) {
+        course = {
+          _id: "",
+          title: "Without course",
+        };
+      }
 
       if (!groupedNotes[courseId]) {
         groupedNotes[courseId] = {
@@ -98,7 +120,10 @@ const getNoteByUserId = async (req, res, next) => {
         };
       }
 
-      groupedNotes[courseId].notes.push(note);
+      groupedNotes[courseId].notes.push({
+        ...note._doc,
+        isFavorite: Boolean(favorites[note._id]),
+      });
     }
 
     // Convert the grouped notes object to an array
@@ -106,6 +131,7 @@ const getNoteByUserId = async (req, res, next) => {
 
     res.json({ notes: groupedNotesArray });
   } catch (err) {
+    console.log(err);
     const error = new HttpError(
       "An error occurred while fetching notes. ",
       500
@@ -132,7 +158,27 @@ const getNotesByCourseTitle = async (req, res, next) => {
       .populate("user_id", "user_name")
       .select("note_id title");
 
-    res.json(notes);
+    const user_id = req.userData.userId;
+
+    let favorites = await favoriteModel.find({
+      user_id,
+      note_id: { $in: notes.map((note) => note._id.toString()) },
+    });
+
+    favorites = favorites.reduce(
+      (acc, fav) => ({
+        ...acc,
+        [fav.note_id]: true,
+      }),
+      {}
+    );
+
+    res.json(
+      notes.map((note) => ({
+        ...note._doc,
+        isFavorite: Boolean(favorites[note._id]),
+      }))
+    );
   } catch (err) {
     const error = new HttpError(
       "An error occurred while fetching notes. ",
@@ -552,6 +598,27 @@ const getNoteWidgets = async (req, res, next) => {
   try {
     const note = await noteModel.findById(req.params.note_id);
     const sections = await sectionModel.find({ _id: { $in: note.sections } });
+
+    const indexDictionary = note.sections.reduce(
+      (acc, id, index) => ({
+        ...acc,
+        [id]: index,
+      }),
+      {}
+    );
+
+    sections.sort((a, b) => {
+      const aIndex = indexDictionary[a._id];
+      const bIndex = indexDictionary[b._id];
+      if (aIndex < bIndex) {
+        return -1;
+      }
+      if (aIndex > bIndex) {
+        return 1;
+      }
+
+      return 0;
+    });
     const widgets = await widgetModel.find({
       section_id: { $in: note.sections },
     });
@@ -586,6 +653,7 @@ const updateNote = async (req, res, next) => {
     note.course_id = course;
 
     await note.save({ session });
+    note.sections = [];
 
     for (const section of sections) {
       let sectionObject =
@@ -602,7 +670,6 @@ const updateNote = async (req, res, next) => {
 
       if (!note.sections.find((_id) => _id === sectionObject._id)) {
         note.sections.push(sectionObject._id);
-        await note.save({ session });
       }
 
       const sectionWidgets = widgets[section._id || section.id];
@@ -629,6 +696,8 @@ const updateNote = async (req, res, next) => {
         await sectionObject.save({ session });
       }
     }
+
+    await note.save({ session });
 
     await session.commitTransaction();
     await session.endSession();
