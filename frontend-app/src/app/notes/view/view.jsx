@@ -19,6 +19,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { makeStyles } from "@mui/styles";
 import { StarRating } from "../../../components/StarRating";
+import Paper from "@mui/material/Paper";
 
 const useStyles = makeStyles({
   underline: {
@@ -58,7 +59,7 @@ export const NoteView = ({}) => {
           data: widget.data || {},
         };
       });
-      
+
       setNote(res.note);
       setSections(
         res.sections.map((section) => ({
@@ -84,18 +85,18 @@ export const NoteView = ({}) => {
     try {
       console.log("Updating rating for note:", noteId);
       console.log("New rating:", newRating);
-  
+
       // Update the user's rating in the state
       setUserRating((prevUserRating) => ({
         ...prevUserRating,
         [noteId]: newRating,
       }));
-  
+
       // Update the user's rating on the server
       await updateNoteRating(noteId, user, newRating, token);
-  
+
       console.log("User rating updated successfully");
-  
+
       // Rest of your code...
     } catch (error) {
       console.error("Error saving user rating:", error);
@@ -161,22 +162,26 @@ export const NoteView = ({}) => {
       </Dialog>
       {/* Position the average rating block */}
       {!!note && (
-        <div
+        <Box
           style={{
-            position: "absolute",
-            bottom: "50px",
-            right: "50px",
+            position: "fixed",
+            right: 24,
+            bottom: 24,
+            padding: 2,
+            margin: 2,
           }}
         >
-          <p>Your Rating:</p>
-          <StarRating
-            value={parseFloat(userRating[note._id]) || 0}
-            onRatingChange={(newRating) =>
-              handleRatingChange(newRating, note._id)
-            }
-            readOnly={false}
-          />
-        </div>
+          <Paper elevation={3} sx={{ padding: 1, margin: 1 }}>
+            <p>Your Rating:</p>
+            <StarRating
+              value={parseFloat(userRating[note._id]) || 0}
+              onRatingChange={(newRating) =>
+                handleRatingChange(newRating, note._id)
+              }
+              readOnly={false}
+            />
+          </Paper>
+        </Box>
       )}
     </Container>
   );

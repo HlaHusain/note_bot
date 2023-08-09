@@ -54,12 +54,12 @@ export const NotesList = () => {
     let fetchNotesList = async () => {
       setIsLoading(true);
       const notes = await getNotes(token, user);
-  
+
       setNotes(notes);
       setIsLoading(false);
     };
     fetchNotesList();
-  
+
     setRefresh(false);
   }, [token, user, refresh]);
 
@@ -210,12 +210,14 @@ export const NotesList = () => {
                   onClose={handleCloseMenu}
                 >
                   {settings.map((setting) => (
-                    <MenuItem key={setting}>
+                    <MenuItem
+                      key={setting}
+                      onClick={() => handleDeleteCourse(note.course_id)}
+                    >
                       {setting === "Delete" && (
                         <>
                           <ClearIcon
                             fontSize="12"
-                            onClick={() => handleDeleteCourse(note.course_id)}
                             sx={{
                               marginRight: 1,
                               opacity: 0.7,
