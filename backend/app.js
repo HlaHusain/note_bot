@@ -19,7 +19,7 @@ var notesRouter = require("./routes/notes");
 var coursesRouter = require("./routes/courses");
 var sectionsRouter = require("./routes/sections");
 var widgetsRouter = require("./routes/widgets");
-var chatRouter = require("./routes/chat");
+//var chatRouter = require("./routes/chat");
 var chatbotRouter = require("./controllers/chatbotController");
 //var socketHandlers = require("./controllers/socketHandlers");
 
