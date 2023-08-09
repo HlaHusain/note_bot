@@ -60,6 +60,8 @@ export const deleteCourseWithNotes = async (course_id,token) => {
       method: 'DELETE',
       headers: { "Content-type": "application/json", Authorization: token },
     });
+
+    console.log('response' , response)
     if (!response.ok) {
       throw new Error('Failed to delete the course.');
     }

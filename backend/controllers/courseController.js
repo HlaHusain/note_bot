@@ -140,7 +140,7 @@ const deleteCourseWithNotes = async (req, res, next) => {
       res.status(200).json({ message: "Course and associated notes deleted." });
     } catch (error) {
       console.log(error);
-      await session.abortTransaction();
+      // await session.abortTransaction();
       const httpError = new HttpError(
         `An error occurred while deleting the course: ${error.message}`,
         500
