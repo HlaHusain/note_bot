@@ -16,4 +16,3 @@ export const getNotesByCourseTitle = async (keyword,token) => {
       throw new Error("Failed to fetch notes by course title.");
     }
   };
-  

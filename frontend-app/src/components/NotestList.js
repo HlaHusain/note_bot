@@ -9,7 +9,7 @@ import TitleIcon from "@mui/icons-material/Title";
 import { useAuth } from "../contexts/AuthProvider";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-
+import { StarRating } from "./StarRating";
 import {
   useTheme,
   Typography,
@@ -32,6 +32,17 @@ export function NotesList({ notes, onFavorite }) {
   };
   const theme = useTheme();
   const navigate = useNavigate();
+
+  const calculateAverageRating = (ratings) => {
+    if (!ratings || ratings.length === 0) {
+      return 0;
+    }
+  
+    const totalRatings = ratings.reduce((sum, rating) => sum + rating.rating, 0);
+    const avgRating = totalRatings / ratings.length;
+    return avgRating;
+  };
+
   return (
     <Grid
       container
@@ -129,13 +140,18 @@ export function NotesList({ notes, onFavorite }) {
               </Typography>
             </CardContent>
             <CardActions disableSpacing>
-              <Rating
+              {/*  <Rating
                 value={note.rating}
                 readOnly
                 sx={{
                   color: "#323232", // Set the color of stars to black
                 }}
-              />
+              /> */}
+              {!!note && (
+                <div>
+                  <StarRating value={calculateAverageRating(note.ratings) || 0} readOnly={true} />
+                </div>
+              )}
             </CardActions>
           </Card>
 

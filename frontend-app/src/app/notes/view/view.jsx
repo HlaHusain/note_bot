@@ -3,12 +3,12 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Unstable_Grid2";
 import { Button, Container, Stack } from "@mui/material";
 import { PageHeader } from "../../../components/PageHeader";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import { useAuth } from "../../../contexts/AuthProvider";
 
 import { Section } from "../create/Section";
-import { deleteNote, getWidgets } from "./api";
+import { deleteNote, getWidgets, updateNoteRating } from "./api";
 import { useNavigate, useParams } from "react-router-dom";
 import { Delete as DeleteIcon } from "@mui/icons-material";
 
@@ -17,21 +17,21 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from "@mui/styles";
+import { StarRating } from "../../../components/StarRating";
 
 const useStyles = makeStyles({
-
   underline: {
-   '& input':{
-    fontSize:'24px',
-   },
+    "& input": {
+      fontSize: "24px",
+    },
     "&&&:before": {
       borderBottom: "none",
     },
     "&&:after": {
       borderBottom: "none",
     },
-  }
+  },
 });
 
 export const NoteView = ({}) => {
@@ -41,7 +41,7 @@ export const NoteView = ({}) => {
   const [sections, setSections] = React.useState([]);
   const [widgets, setWidgets] = React.useState({});
   const { token, user } = useAuth();
-
+  const [userRating, setUserRating] = useState({});
   const classes = useStyles();
 
   useEffect(() => {
@@ -58,6 +58,7 @@ export const NoteView = ({}) => {
           data: widget.data || {},
         };
       });
+      
       setNote(res.note);
       setSections(
         res.sections.map((section) => ({
@@ -79,17 +80,38 @@ export const NoteView = ({}) => {
     navigate(`/notes`);
   };
 
-  console.log(
-    !!note &&
-    note.user_id === user
-  )
+  const handleRatingChange = async (newRating, noteId) => {
+    try {
+      console.log("Updating rating for note:", noteId);
+      console.log("New rating:", newRating);
+  
+      // Update the user's rating in the state
+      setUserRating((prevUserRating) => ({
+        ...prevUserRating,
+        [noteId]: newRating,
+      }));
+  
+      // Update the user's rating on the server
+      await updateNoteRating(noteId, user, newRating, token);
+  
+      console.log("User rating updated successfully");
+  
+      // Rest of your code...
+    } catch (error) {
+      console.error("Error saving user rating:", error);
+    }
+  };
+  console.log("note.user_id:", note ? note.user_id : "null");
+  console.log("user_id:", user ? user : "null");
+
+  console.log(!!note && note.user_id === user);
   return (
     <Container sx={{ flexGrow: 1, padding: 2 }}>
       <PageHeader
         title={note?.title}
         isEditable={false}
         disabled={!note}
-        variant={'standard'}
+        variant={"standard"}
         InputProps={{ classes }}
         actions={
           !!note &&
@@ -137,6 +159,25 @@ export const NoteView = ({}) => {
           </Button>
         </DialogActions>
       </Dialog>
+      {/* Position the average rating block */}
+      {!!note && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: "50px",
+            right: "50px",
+          }}
+        >
+          <p>Your Rating:</p>
+          <StarRating
+            value={parseFloat(userRating[note._id]) || 0}
+            onRatingChange={(newRating) =>
+              handleRatingChange(newRating, note._id)
+            }
+            readOnly={false}
+          />
+        </div>
+      )}
     </Container>
   );
 };

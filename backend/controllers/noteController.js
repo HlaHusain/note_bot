@@ -188,64 +188,6 @@ const getNotesByCourseTitle = async (req, res, next) => {
   }
 };
 
-// // Create a new note
-// const createNote = async (req, res, next) => {
-//   const { user_id, title, isPublic, course_id } = req.body;
-
-//   //console.log(user_id, title, isPublic, course_id);
-
-//   try {
-//     // Input validation
-//     if (!user_id || !title || !course_id) {
-//       return res.status(400).json({ message: "Missing required fields." });
-//     }
-
-//     const [user, course] = await Promise.all([
-//       userModel.findById(user_id),
-//       courseModel.findById(course_id),
-//     ]);
-
-//     // Check if user and course exist
-//     if (!user) {
-//       return res
-//         .status(404)
-//         .json({ message: "Could not find user for the provided id." });
-//     }
-//     if (!course) {
-//       return res
-//         .status(404)
-//         .json({ message: "Could not find course for the provided id." });
-//     }
-
-//     try {
-//       const sess = await mongoose.startSession();
-//       sess.startTransaction();
-//       const createdNote = new noteModel({
-//         title,
-//         notes: noteIds,
-//       });
-//       await createdNote.save({ session: sess }); //add the note to the database
-//       user.notes.push(createdNote); //push the note to the user
-//       await user.save({ session: sess }); //save the user
-//       await sess.commitTransaction();
-
-//       console.log("createdNote", createdNote);
-
-//       res.status(201).json({ message: "Note created!", note: createdNote });
-//     } catch (error) {
-//       await session.abortTransaction();
-//       throw error;
-//     } finally {
-//       session.endSession();
-//     }
-//   } catch (err) {
-//     const error = new HttpError(
-//       "Creating note failed, please try again later.",
-//       500
-//     );
-//     return next(error);
-//   }
-// };
 const createNoteWithEmptySections = async (req, res, next) => {
   const { user_id, title, isPublic, course_id } = req.body;
 
@@ -391,40 +333,6 @@ const createNote = async (req, res, next) => {
     return next(error);
   }
 };
-
-//update note
-// const updateNote = async (req, res, next) => {
-//   const { title, isPublic, course_id } = req.body;
-//   const note_id = req.params.note_id;
-
-//   try {
-//     let note = await noteModel.findById(note_id);
-
-//     if (!note) {
-//       return res
-//         .status(404)
-//         .json({ message: "Could not find note for the provided id." });
-//     }
-
-//     note.title = title;
-//     note.isPublic = isPublic;
-//     note.course_id = course_id;
-
-//     note = await note.save();
-
-//     res.status(200).json({
-//       message: "Note updated!",
-//       note: note.toObject({ getters: true }),
-//     });
-//   } catch (err) {
-//     console.log("error", err);
-//     const error = new HttpError(
-//       "Updating note failed, please try again later.",
-//       500
-//     );
-//     return next(error);
-//   }
-// };
 
 //delete note
 const deleteNote = async (req, res, next) => {
@@ -713,6 +621,57 @@ const updateNote = async (req, res, next) => {
   }
 };
 
+// Update Note Rating
+const updateRating = async (req, res, next) => {
+  const { noteId, userId, rating } = req.body;
+  console.log("Received parameters: noteId =", noteId, "userId =", userId, "rating =", rating);
+  try {
+    let updatedNote;
+
+    // Check if the user has rated before for this note
+    const existingRating = await noteModel.findOne({
+      _id: noteId,
+      "ratings.userId": userId,
+    });
+
+    if (existingRating) {
+
+      // Update the existing rating
+      updatedNote = await noteModel.findOneAndUpdate(
+        { _id: noteId, "ratings.userId": userId },
+        { $set: { "ratings.$.rating": rating } },
+        { new: true }
+      );
+    } else {
+      
+      // Add a new rating if the user is rating for the first time
+      updatedNote = await noteModel.findOneAndUpdate(
+        { _id: noteId },
+        { $push: { ratings: { userId, rating } } },
+        { new: true }
+      );
+    }
+    console.log("Updated note:", updatedNote);
+    if (!updatedNote) {
+      return res
+        .status(404)
+        .json({ message: "Could not find note or user rating." });
+    }
+
+    res.status(200).json({
+      message: "Note rating updated!",
+      note: updatedNote,
+    });
+  } catch (err) {
+    console.error("Error updating note rating:", err);
+    const error = new HttpError(
+      "Updating note rating failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+};
+
 exports.getNoteWidgets = getNoteWidgets;
 
 exports.getNotesByUserIdAndCourseId = getNotesByUserIdAndCourseId;
@@ -728,3 +687,5 @@ exports.getSavedNotesByUserId = getSavedNotesByUserId;
 exports.getNoteByNoteID = getNoteByNoteID;
 exports.createNoteWithEmptySections = createNote;
 exports.pushSectionsToNote = pushSectionsToNote;
+
+exports.updateRating = updateRating;

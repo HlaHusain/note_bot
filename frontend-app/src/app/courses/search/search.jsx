@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Container, Typography } from "@mui/material";
 import { PHeader } from "../../../components/PHeader";
-import { getNotesByCourseTitle } from "./api";
+import { getNotesByCourseTitle, updateNoteRating } from "./api";
 import { useAuth } from "../../../contexts/AuthProvider";
 import { NotesList } from "../../../components/NotestList";
 
@@ -27,6 +27,7 @@ export const SearchByCourse = () => {
         setError(null);
         const fetchedNotes = await getNotesByCourseTitle(keyword, token);
         setNotes(fetchedNotes);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching notes:", error);
         setError("Error fetching notes");

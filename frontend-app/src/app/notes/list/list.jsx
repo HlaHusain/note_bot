@@ -45,8 +45,6 @@ export const NotesList = () => {
   const [courses, setCourses] = useState([]);
   const [refresh, setRefresh] = useState(false);
 
-  
-  
   const [notes, setNotes] = useState([]);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const { token, user } = useAuth();
@@ -56,11 +54,12 @@ export const NotesList = () => {
     let fetchNotesList = async () => {
       setIsLoading(true);
       const notes = await getNotes(token, user);
+  
       setNotes(notes);
       setIsLoading(false);
     };
     fetchNotesList();
-
+  
     setRefresh(false);
   }, [token, user, refresh]);
 
