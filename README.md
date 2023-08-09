@@ -98,8 +98,15 @@ That will open the project on your default browser: http://localhost:3001/.
 <br>
 
 ## 🚀 Deployment
+### Backend Deployment​: Render
+ <img src="https://github.com/HlaHusain/note_bot/blob/main/Render.png" alt="Screenshot 6" width="500">
 
-<br>
+<br><br>
+
+### Frontend Deployment​: Vercel
+<img src="https://github.com/HlaHusain/note_bot/blob/main/Vercel.png" width="500">
+
+<br><br>
 
 
 ## 👥 Group Members
