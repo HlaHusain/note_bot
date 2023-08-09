@@ -1,22 +1,29 @@
 # NoteBot App
-
+  <img align="right" src="https://github.com/HlaHusain/note_bot/blob/main/NoteBot%20logo.png" alt="App Icon" width="250">
+  
 ## 📚 Description
+
+
 * NoteBot is a web application that enables students to co-create lecture notes, supported by generative AI models (e.g., ChatGPT).
 
 * It was initially developed by [Hla Abuhamra](https://github.com/HlaHusain), [Yusra Abdulrahman](https://github.com/Yusra-3033), [Hadeel Saleh](https://github.com/hadeelalzenaty-web), and [Hadil Khbaiz]() in the frame of the AWT course in summer semester 2023.
 
 * It was created with React, Nodejs, Express, Mongoose, MongoDB Atlas, OpenAi, and ChatGPT `gpt-3.5-turbo` model.
 
-  
-![image](https://github.com/HlaHusain/note_bot/assets/72098393/46c32532-51a0-4327-ba42-03126ba7c80a)
+<br><br>
 
 
+## Demo:
 
-## Demo: <br />
+<br>
 
 
 
 ## ✨ Features
+
+<img align="right" src="https://github.com/HlaHusain/note_bot/blob/main/Figma%20Screenshot.png" alt="App Icon" width="500">
+
+<br>
 
 - ✅  Note creation and organization​
 
@@ -30,17 +37,22 @@
 
 - ✅  User authentication and authorization
 
-
+<br><br>
 
 ## 🖼️ Screenshots
+<div style="display: flex;">
+  <img src="https://github.com/HlaHusain/note_bot/blob/main/localhost_3001_notes_64ab3ac627fbf48f13527db8%20(9).png" alt="Screenshot 1" width="500">
+  <img src="https://github.com/HlaHusain/note_bot/blob/main/localhost_3001_notes_64ab3ac627fbf48f13527db8%20(3).png" alt="Screenshot 2" width="500">
+  <img src="https://github.com/HlaHusain/note_bot/blob/main/localhost_3001_notes_64ab3ac627fbf48f13527db8%20(5).png" alt="Screenshot 3" width="500">
+  <img src="https://github.com/HlaHusain/note_bot/blob/main/localhost_3001_notes_64ab3ac627fbf48f13527db8%20(6).png" alt="Screenshot 4" width="500">
+  <img src="https://github.com/HlaHusain/note_bot/blob/main/localhost_3001_notes_64ab3ac627fbf48f13527db8%20(7).png" alt="Screenshot 5" width="500">
+  <img src="https://github.com/HlaHusain/note_bot/blob/main/localhost_3001_notes_64ab3ac627fbf48f13527db8%20(8).png" alt="Screenshot 6" width="500">
+</div>
 
-![Screenshot 1](/images/screenshot1.png)
-![Screenshot 2](/images/screenshot2.png)
-
+<br><br>
 
 ## 🏗️ Technical Architecture
-
-## Dependencies
+<img align="right" src="https://github.com/HlaHusain/note_bot/blob/main/Screenshot%202023-08-08%20at%2021.24.49.png" alt="Tech Used" width="500" style="max-width:100%;">
 
 ### Database
 * 🛢️ [MongoDB Atlas](https://www.mongodb.com/atlas)
@@ -56,26 +68,38 @@
 * ⚛️ [React](https://react.dev/)
 * 🎨 [Material UI](https://vitejs.dev/)
 
-## 🔧 Installation
-* Clone this repo `https://github.com/HlaHusain/note_bot.git`
-* Navigate into the repo `cd note_bot`
+<br><br>
 
-* Navigate into the `backend` folder `cd backend`
-* Install the dependencies ``npm install``
-* Replace the configuration data of OpenAI_API_KEY with your own data in the `controllers/chatbotController.js` file
-* Run the `app.js` file `nodemon app.js`
+## 🚀 Installation
+### Server Side
+1. Clone this repo `https://github.com/HlaHusain/note_bot.git`
+2.  Navigate into the repo `cd note_bot`
 
-*That will start the backend server on port `3000`: http://localhost:3000/*
+3. Navigate into the `backend` folder `cd backend`
+4. Install the dependencies ``npm install``
+5. Replace the configuration data of OpenAI_API_KEY with your own data in the `controllers/chatbotController.js` file
+6. Run the `app.js` file `nodemon app.js`
 
-* Navigate into the `frontend` folder `cd frontend`
-* Install the dependencies ``npm install``
-* Start the local server ``npm start``
+````
+That will start the backend server on port `3000`: http://localhost:3000/
+````
 
-*That will open the project on your default browser: http://localhost:3001/. You can now create your own notes with the AI assistance from your browser*
 
+### Client Side
+1. Navigate into the `frontend` folder `cd frontend`
+2. Install the dependencies ``npm install``
+3. Start the local server ``npm start``
+
+````
+That will open the project on your default browser: http://localhost:3001/. 
+````
+
+### You can now create your own notes with AI assistance from your browser 😉
+<br>
 
 ## 🚀 Deployment
 
+<br>
 
 
 ## 👥 Group Members
