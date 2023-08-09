@@ -13,7 +13,7 @@
 <br><br>
 
 
-## Demo:
+### Demo: [Watch the video](https://www.youtube.com/watch?v=IPsVFVxYa80)
 
 <br>
 
@@ -52,7 +52,7 @@
 <br><br>
 
 ## 🏗️ Technical Architecture
-<img align="right" src="https://github.com/HlaHusain/note_bot/blob/main/Screenshot%202023-08-08%20at%2021.24.49.png" alt="Tech Used" width="500" style="max-width:100%;">
+<img align="right" src="https://github.com/HlaHusain/note_bot/blob/main/Screenshot%202023-08-08%20at%2021.24.49.png" alt="Tech Used" width="450" style="max-width:100%;">
 
 ### Database
 * 🛢️ [MongoDB Atlas](https://www.mongodb.com/atlas)
@@ -98,13 +98,13 @@ That will open the project on your default browser: http://localhost:3001/.
 <br>
 
 ## 🚀 Deployment
-### Backend Deployment​: Render
- <img src="https://github.com/HlaHusain/note_bot/blob/main/Render.png" alt="Screenshot 6" width="500">
+### Backend Deployment​: [Render](https://note-api-axxd.onrender.com/)
+ <img src="https://github.com/HlaHusain/note_bot/blob/main/Render.png" alt="Screenshot 6" width="600">
 
-<br><br>
+<br>
 
-### Frontend Deployment​: Vercel
-<img src="https://github.com/HlaHusain/note_bot/blob/main/Vercel.png" width="500">
+### Frontend Deployment​: [Vercel](https://note-bot-git-main-hlahusain.vercel.app/)
+<img src="https://github.com/HlaHusain/note_bot/blob/main/Vercel.png" width="600">
 
 <br><br>
 
