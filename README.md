@@ -21,7 +21,7 @@
 
 ## ✨ Features
 
-<img align="right" src="https://github.com/HlaHusain/note_bot/blob/main/Figma%20Screenshot.png" alt="App Icon" width="500">
+<img align="right" src="https://github.com/HlaHusain/note_bot/blob/main/Figma%20Screenshot.png" alt="App Icon" width="400">
 
 <br>
 
@@ -41,12 +41,12 @@
 
 ## 🖼️ Screenshots
 <div style="display: flex;">
-  <img src="https://github.com/HlaHusain/note_bot/blob/main/localhost_3001_notes_64ab3ac627fbf48f13527db8%20(9).png" alt="Screenshot 1" width="500">
-  <img src="https://github.com/HlaHusain/note_bot/blob/main/localhost_3001_notes_64ab3ac627fbf48f13527db8%20(3).png" alt="Screenshot 2" width="500">
-  <img src="https://github.com/HlaHusain/note_bot/blob/main/localhost_3001_notes_64ab3ac627fbf48f13527db8%20(5).png" alt="Screenshot 3" width="500">
-  <img src="https://github.com/HlaHusain/note_bot/blob/main/localhost_3001_notes_64ab3ac627fbf48f13527db8%20(6).png" alt="Screenshot 4" width="500">
-  <img src="https://github.com/HlaHusain/note_bot/blob/main/localhost_3001_notes_64ab3ac627fbf48f13527db8%20(7).png" alt="Screenshot 5" width="500">
-  <img src="https://github.com/HlaHusain/note_bot/blob/main/localhost_3001_notes_64ab3ac627fbf48f13527db8%20(8).png" alt="Screenshot 6" width="500">
+  <img src="https://github.com/HlaHusain/note_bot/blob/main/localhost_3001_notes_64ab3ac627fbf48f13527db8%20(9).png" alt="Screenshot 1" width="350">
+  <img src="https://github.com/HlaHusain/note_bot/blob/main/localhost_3001_notes_64ab3ac627fbf48f13527db8%20(3).png" alt="Screenshot 2" width="350">
+  <img src="https://github.com/HlaHusain/note_bot/blob/main/localhost_3001_notes_64ab3ac627fbf48f13527db8%20(5).png" alt="Screenshot 3" width="350">
+  <img src="https://github.com/HlaHusain/note_bot/blob/main/localhost_3001_notes_64ab3ac627fbf48f13527db8%20(6).png" alt="Screenshot 4" width="350">
+  <img src="https://github.com/HlaHusain/note_bot/blob/main/localhost_3001_notes_64ab3ac627fbf48f13527db8%20(7).png" alt="Screenshot 5" width="350">
+  <img src="https://github.com/HlaHusain/note_bot/blob/main/localhost_3001_notes_64ab3ac627fbf48f13527db8%20(8).png" alt="Screenshot 6" width="350">
 </div>
 
 <br><br>
